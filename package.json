@@ -17,12 +17,17 @@
     "@supabase/auth-ui-react": "^0.4.7",
     "@supabase/auth-ui-shared": "^0.1.8",
     "@supabase/supabase-js": "^2.39.8",
+    "chart.js": "^4.3.0",
     "date-fns": "^3.6.0",
     "framer-motion": "^11.0.20",
     "react": "^18.2.0",
+    "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
+    "react-icons": "^5.0.1",
     "react-router-dom": "^6.22.3",
-    "recharts": "^2.12.3"
+    "react-table": "^7.8.0",
+    "recharts": "^2.12.3",
+    "yup": "^1.1.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.64",

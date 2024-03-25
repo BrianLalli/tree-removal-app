@@ -1,28 +1,29 @@
-// src/theme.js
+// src/theme-dark.js
 import { createTheme } from '@mui/material/styles';
 
-const theme = createTheme({
+const themeDark = createTheme({
   palette: {
-    mode: 'light',
+    mode: 'dark',
     primary: {
-      main: '#3ab649',
+      main: '#9c27b0', // Adjust the color for your dark theme
     },
     secondary: {
-      main: '#3FA646',
+      main: '#673ab7', // Adjust the color for your dark theme
     },
     error: {
-      main: '#f44336',
+      main: '#f44336', // You might keep this the same or adjust for dark theme
     },
     background: {
-      default: '#F2F2F2',
-      paper: '#ffffff',
+      default: '#242424', // Darker background for dark mode
+      paper: '#424242',
     },
     text: {
-      primary: '#0D0000',
-      secondary: '#5BA660',
+      primary: '#ffffff', // Brighter text for dark mode
+      secondary: '#adb5bd', // Adjust as needed
     },
   },
   typography: {
+    // Define typography for dark mode if needed; otherwise, keep it same as light theme
     fontFamily: [
       '-apple-system',
       'BlinkMacSystemFont',
@@ -47,11 +48,11 @@ const theme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
+          borderRadius: 8, // Customize button border radius for dark mode if needed
         },
       },
     },
   },
 });
 
-export default theme;
+export default themeDark;

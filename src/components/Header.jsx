@@ -70,7 +70,7 @@ const Header = () => {
           </Box>
           {/* Mobile Menu Icon Here */}
           <Box sx={{ display: { xs: "block", md: "none" } }}>
-            <Button onClick={toggleDrawer(true)} color="inherit">
+            <Button onClick={toggleDrawer(true)} color="primary">
               <MenuIcon />
             </Button>
           </Box>
