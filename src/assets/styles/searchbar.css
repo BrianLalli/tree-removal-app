@@ -47,7 +47,9 @@
 
 .search-button {
   padding: 12px 24px;
-  background-color: #3ab649; /* Use color from your theme */
+  background-color: #0D0000; /* Use color from your theme */
+  border-color: #3FA646;
+  border-width: 3px;
   color: #ffffff;
   font-size: 16px;
   border-radius: 20px;
