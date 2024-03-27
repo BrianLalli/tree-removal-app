@@ -56,7 +56,7 @@ const HomePage = () => {
         Manage simple to complex jobs and everything in between
       </Typography>
 
-      <Link to="/board" style={{ textDecoration: 'none' }}>
+      <Link to="/working-board" style={{ textDecoration: 'none' }}>
         <StyledButton variant="contained">Get Started</StyledButton>
       </Link>
       <SearchBar />

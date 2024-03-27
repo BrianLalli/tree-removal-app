@@ -6,6 +6,7 @@ import Home from "./views/Home";
 import Header from "./components/Header";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Footer from "./components/Footer";
+import WorkingBoard from "./views/WorkingBoard";
 
 function App() {
   return (
@@ -23,6 +24,17 @@ function App() {
             path="/"
           />
           <Route element={<Login />} path="/login" />
+          // New route for the WorkingBoard component
+          <Route
+            element={
+              <ProtectedRoute>
+                <Header />
+                <WorkingBoard />
+                <Footer />
+              </ProtectedRoute>
+            }
+            path="/working-board"
+          />
         </Routes>
       </Router>
     </AppContextProvider>

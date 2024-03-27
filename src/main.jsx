@@ -9,10 +9,10 @@ const root = document.getElementById('root');
 
 if (root) {
   ReactDOM.createRoot(root).render(
-    <React.StrictMode>
+    // <React.StrictMode>
       <ThemeProvider theme={theme}> {/* Now using your custom theme */}
         <App />
       </ThemeProvider>
-    </React.StrictMode>,
+    // </React.StrictMode>,
   );
 }
