@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Box, Button, Typography, useTheme } from '@mui/material';
 import { alpha } from '@mui/material/styles';
+import CustomerDetail from '../components/CustomerDetail';
 
 const initialCustomerGroups = {
   'group-1': {
@@ -45,151 +46,196 @@ const initialCustomerGroups = {
 console.log('Initial Groups:', initialCustomerGroups);
 
 const WorkingBoard = () => {
-  const [customerGroups, setCustomerGroups] = useState(initialCustomerGroups);
-  const theme = useTheme();
-
-  const reorder = (list, startIndex, endIndex) => {
-    const result = Array.from(list);
-    const [removed] = result.splice(startIndex, 1);
-    result.splice(endIndex, 0, removed);
-    return result;
-  };
-
-  const move = (source, destination, droppableSource, droppableDestination) => {
-    const sourceClone = Array.from(source);
-    const destClone = Array.from(destination);
-    const [removed] = sourceClone.splice(droppableSource.index, 1);
-
-    destClone.splice(droppableDestination.index, 0, removed);
-
-    return [sourceClone, destClone];
-  };
-
-  const onDragEnd = (result) => {
-    const { source, destination } = result;
-
-    if (!destination) {
-      return;
-    }
-
-    if (source.droppableId === destination.droppableId) {
-      const items = reorder(
-        customerGroups[source.droppableId].items,
-        source.index,
-        destination.index
-      );
-
-      const newState = {
-        ...customerGroups,
-        [source.droppableId]: { ...customerGroups[source.droppableId], items },
-      };
-      setCustomerGroups(newState);
-    } else {
-      const [sourceClone, destClone] = move(
-        customerGroups[source.droppableId].items,
-        customerGroups[destination.droppableId].items,
-        source,
-        destination
-      );
-
-      const newState = {
-        ...customerGroups,
-        [source.droppableId]: {
-          ...customerGroups[source.droppableId],
-          items: sourceClone,
-        },
-        [destination.droppableId]: {
-          ...customerGroups[destination.droppableId],
-          items: destClone,
-        },
-      };
-      setCustomerGroups(newState);
-    }
-  };
-
-  return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'flex-start',
-          padding: theme.spacing(2),
-          backgroundColor: theme.palette.background.primary,
-          gap: theme.spacing(2),
-          margin: 'auto',
-          flexWrap: 'wrap',
-          overflowY: 'auto',
-          maxWidth: '100%',
-          maxHeight: `calc(100vh - ${theme.spacing(30)})`,
-          '& > *': {
-            flex: '1 1 auto',
-            width: {
-              xs: '100%',
-              sm: '48%',
-              md: '30%',
-              lg: 'auto',
-            },
-            minWidth: 200,
+    const [customerGroups, setCustomerGroups] = useState(initialCustomerGroups);
+    const theme = useTheme();
+    const [editingCustomer, setEditingCustomer] = useState(null);
+  
+    const reorder = (list, startIndex, endIndex) => {
+      const result = Array.from(list);
+      const [removed] = result.splice(startIndex, 1);
+      result.splice(endIndex, 0, removed);
+      return result;
+    };
+  
+    const move = (source, destination, droppableSource, droppableDestination) => {
+      const sourceClone = Array.from(source);
+      const destClone = Array.from(destination);
+      const [removed] = sourceClone.splice(droppableSource.index, 1);
+  
+      destClone.splice(droppableDestination.index, 0, removed);
+  
+      return [sourceClone, destClone];
+    };
+  
+    const onDragEnd = (result) => {
+      const { source, destination } = result;
+  
+      if (!destination) {
+        return;
+      }
+  
+      if (source.droppableId === destination.droppableId) {
+        const items = reorder(
+          customerGroups[source.droppableId].items,
+          source.index,
+          destination.index
+        );
+  
+        const newState = {
+          ...customerGroups,
+          [source.droppableId]: { ...customerGroups[source.droppableId], items },
+        };
+        setCustomerGroups(newState);
+      } else {
+        const [sourceClone, destClone] = move(
+          customerGroups[source.droppableId].items,
+          customerGroups[destination.droppableId].items,
+          source,
+          destination
+        );
+  
+        const newState = {
+          ...customerGroups,
+          [source.droppableId]: {
+            ...customerGroups[source.droppableId],
+            items: sourceClone,
           },
-        }}
-      >
-        {Object.entries(customerGroups).map(([groupId, group]) => (
-          <Droppable droppableId={groupId} key={groupId}>
-            {(provided, snapshot) => (
-              <Box
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-                sx={{
-                  backgroundColor: theme.palette.background.paper,
-                  padding: theme.spacing(2),
-                  borderRadius: theme.shape.borderRadius,
-                  boxShadow: snapshot.isDraggingOver ? 3 : 1,
-                  margin: theme.spacing(1),
-                  color: theme.palette.text.primary,
-                }}
-              >
-                <Typography variant="h6" sx={{ wordBreak: 'break-word' }}>
-                  {group.name}
-                </Typography>
-                {group.items.map((customer, index) => (
-                  <Draggable
-                    key={customer.id}
-                    draggableId={customer.id.toString()}
-                    index={index}
-                  >
-                    {(provided, snapshot) => (
-                      <Box
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        sx={{
-                          backgroundColor: snapshot.isDragging
-                            ? alpha(theme.palette.action.hover, 0.8)
-                            : alpha(group.color, 0.7),
-                          padding: theme.spacing(1),
-                          margin: theme.spacing(1),
-                          borderRadius: theme.shape.borderRadius,
-                          boxShadow: 1,
-                          cursor: 'grab',
-                          color: theme.palette.getContrastText(alpha(group.color, 0.7)),
-                        }}
-                      >
-                        {customer.content}
-                      </Box>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-                <Button variant="contained" color="primary" sx={{ mt: 1 }}>
-                  + New
-                </Button>
-              </Box>
-            )}
-          </Droppable>
-        ))}
-      </Box>
-    </DragDropContext>
-  );
-};
-
-export default WorkingBoard;
+          [destination.droppableId]: {
+            ...customerGroups[destination.droppableId],
+            items: destClone,
+          },
+        };
+        setCustomerGroups(newState);
+      }
+    };
+  
+    const handleCloseDetail = () => {
+      setEditingCustomer(null);
+    };
+  
+    const handleSaveDetail = (customerId, details) => {
+        // Update the customer details in the state
+        setCustomerGroups(prevGroups => {
+          const newGroups = { ...prevGroups };
+      
+          for (const groupKey in newGroups) {
+            const group = newGroups[groupKey];
+            const customerIndex = group.items.findIndex(item => item.id === customerId);
+            
+            if (customerIndex > -1) {
+              // Assuming you want to store additional details alongside existing ones
+              const updatedCustomer = {
+                ...group.items[customerIndex],
+                ...details,
+              };
+      
+              group.items[customerIndex] = updatedCustomer;
+      
+              // Save the updated customer details to local storage
+              localStorage.setItem(customerId, JSON.stringify(updatedCustomer));
+              break; // Stop the loop once we've updated the customer
+            }
+          }
+      
+          return newGroups;
+        });
+      
+        console.log('Saving details for customer:', customerId, details);
+        handleCloseDetail();
+      };
+      
+  
+    return (
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'flex-start',
+            padding: theme.spacing(2),
+            backgroundColor: theme.palette.background.primary,
+            gap: theme.spacing(2),
+            margin: 'auto',
+            flexWrap: 'wrap',
+            overflowY: 'auto',
+            maxWidth: '100%',
+            maxHeight: `calc(100vh - ${theme.spacing(30)})`,
+            '& > *': {
+              flex: '1 1 auto',
+              width: {
+                xs: '100%',
+                sm: '48%',
+                md: '30%',
+                lg: 'auto',
+              },
+              minWidth: 200,
+            },
+          }}
+        >
+          {Object.entries(customerGroups).map(([groupId, group]) => (
+            <Droppable droppableId={groupId} key={groupId}>
+              {(provided, snapshot) => (
+                <Box
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                  sx={{
+                    backgroundColor: theme.palette.background.paper,
+                    padding: theme.spacing(2),
+                    borderRadius: theme.shape.borderRadius,
+                    boxShadow: snapshot.isDraggingOver ? 3 : 1,
+                    margin: theme.spacing(1),
+                    color: theme.palette.text.primary,
+                  }}
+                >
+                  <Typography variant="h6" sx={{ wordBreak: 'break-word' }}>
+                    {group.name}
+                  </Typography>
+                  {group.items.map((customer, index) => (
+                    <Draggable
+                      key={customer.id}
+                      draggableId={customer.id.toString()}
+                      index={index}
+                    >
+                      {(provided, snapshot) => (
+                        <Box
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          onDoubleClick={() => setEditingCustomer(customer)}
+                          sx={{
+                            backgroundColor: snapshot.isDragging
+                              ? alpha(theme.palette.action.hover, 0.8)
+                              : alpha(group.color, 0.7),
+                            padding: theme.spacing(1),
+                            margin: theme.spacing(1),
+                            borderRadius: theme.shape.borderRadius,
+                            boxShadow: 1,
+                            cursor: 'grab',
+                            color: theme.palette.getContrastText(alpha(group.color, 0.7)),
+                          }}
+                        >
+                          {customer.content}
+                        </Box>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                  <Button variant="contained" color="primary" sx={{ mt: 1 }}>
+                    + New
+                  </Button>
+                </Box>
+              )}
+            </Droppable>
+          ))}
+        </Box>
+        {editingCustomer && (
+          <CustomerDetail
+            customer={editingCustomer}
+            onClose={handleCloseDetail}
+            onSave={handleSaveDetail}
+          />
+        )}
+      </DragDropContext>
+    );
+  };
+  
+  export default WorkingBoard;
