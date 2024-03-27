@@ -1,0 +1,42 @@
+.working-board {
+    display: flex;
+    justify-content: space-around;
+    padding: 16px;
+  }
+  
+  .customer-group {
+    background-color: #f4f4f4;
+    padding: 16px;
+    border-radius: 8px;
+    width: 200px; /* Adjust the width as necessary */
+    margin-right: 16px;
+  }
+  
+  .customer-group.dragging-over {
+    background-color: #e0e0e0;
+  }
+  
+  .customer-card {
+    background-color: #fff;
+    padding: 8px;
+    margin: 0 0 8px 0;
+    border-radius: 4px;
+    box-shadow: 0 2px 1px rgba(0,0,0,0.05);
+    cursor: grab;
+  }
+  
+  .customer-card.dragging {
+    background-color: #ddd;
+    cursor: grabbing;
+  }
+  
+  .new-customer-button {
+    margin-top: 8px;
+    background-color: #24a0ed;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  

@@ -1,0 +1,49 @@
+import React from 'react';
+import { Box, Container, Typography, IconButton, Grid } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import TwitterIcon from '@mui/icons-material/Twitter';
+import FacebookIcon from '@mui/icons-material/Facebook';
+import InstagramIcon from '@mui/icons-material/Instagram';
+
+const FooterBox = styled(Box)(({ theme }) => ({
+  position: 'fixed',
+  left: 0,
+  bottom: 0,
+  width: '100%',
+  backgroundColor: theme.palette.primary.main,
+  color: theme.palette.getContrastText(theme.palette.grey[900]),
+  padding: theme.spacing(1, 0),
+  borderTop: `1px solid ${theme.palette.divider}`,
+  [theme.breakpoints.down('sm')]: {
+    padding: theme.spacing(1, 2), // Increase side padding on smaller screens for better readability
+  },
+}));
+
+const Footer = () => {
+  return (
+    <FooterBox>
+      <Container maxWidth="lg">
+        <Grid container alignItems="center" justifyContent="space-between" spacing={1}>
+          <Grid item xs={12} sm={6} textAlign={{ xs: 'center', sm: 'left' }}>
+            <Typography variant="body2" color="inherit">
+              © {new Date().getFullYear()} Two Guys Tree Service. All rights reserved.
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm={6} textAlign={{ xs: 'center', sm: 'right' }}>
+            <IconButton color="inherit" component="a" href="https://twitter.com">
+              <TwitterIcon />
+            </IconButton>
+            <IconButton color="inherit" component="a" href="https://facebook.com">
+              <FacebookIcon />
+            </IconButton>
+            <IconButton color="inherit" component="a" href="https://instagram.com">
+              <InstagramIcon />
+            </IconButton>
+          </Grid>
+        </Grid>
+      </Container>
+    </FooterBox>
+  );
+};
+
+export default Footer;
