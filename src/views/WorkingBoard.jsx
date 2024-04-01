@@ -128,8 +128,10 @@ const WorkingBoard = () => {
 
         if (customerIndex > -1) {
           // Assuming you want to store additional details alongside existing ones
+          // Update the content with the name from details
           const updatedCustomer = {
             ...group.items[customerIndex],
+            content: details.name, // Here we update the name
             ...details,
           };
 
@@ -221,28 +223,28 @@ const WorkingBoard = () => {
       <DragDropContext onDragEnd={onDragEnd}>
         <SearchBar />
         <Box
-      sx={{
-        display: 'flex',
-        justifyContent: 'flex-start',
-        padding: theme.spacing(2),
-        backgroundColor: theme.palette.background.primary,
-        gap: theme.spacing(2),
-        margin: 'auto',
-        flexWrap: 'wrap',
-        overflow: 'auto',
-        maxWidth: '100%',
-        '& > *': {
-          flex: '1 1 auto',
-          width: {
-            xs: '100%',
-            sm: '48%',
-            md: '30%',
-            lg: 'auto',
-          },
-          minWidth: 200,
-        },
-      }}
-    >
+          sx={{
+            display: "flex",
+            justifyContent: "flex-start",
+            padding: theme.spacing(2),
+            backgroundColor: theme.palette.background.primary,
+            gap: theme.spacing(2),
+            margin: "auto",
+            flexWrap: "wrap",
+            overflow: "auto",
+            maxWidth: "100%",
+            "& > *": {
+              flex: "1 1 auto",
+              width: {
+                xs: "100%",
+                sm: "48%",
+                md: "30%",
+                lg: "auto",
+              },
+              minWidth: 200,
+            },
+          }}
+        >
           {Object.entries(customerGroups).map(([groupId, group]) => (
             <Droppable droppableId={groupId} key={groupId}>
               {(provided, snapshot) => (

@@ -27,8 +27,12 @@ const CustomerDetail = ({ customer, onClose, onSave, onMove, onDelete }) => {
     name: customer.content,
     phoneNumber: "",
     address: "",
-    tasks: "",
+    email: "",
+    tasks1: "",
+    tasks2: "",
+    tasks3: "",
     totalPrice: "",
+    notes: "",
     status: customer.groupId || "group-1",
   });
   const [open, setOpen] = useState(false);
@@ -78,26 +82,31 @@ const CustomerDetail = ({ customer, onClose, onSave, onMove, onDelete }) => {
         width: "100%",
         height: "100%",
         display: "flex",
-        alignItems: "center",
+        alignItems: "flex-start", // Aligns the form to the top, especially important on small screens
         justifyContent: "center",
         backgroundColor: "rgba(0, 0, 0, 0.9)",
+        paddingTop: "10vh", // Adds some space at the top
         zIndex: theme.zIndex.modal,
+        overflowY: "auto", // Allows scrolling on small screens
       }}
     >
       <div
         style={{
-          padding: theme.spacing(4),
+          marginTop: "20px", // Additional top margin if needed
+          padding: theme.spacing(2),
           backgroundColor: theme.palette.background.default,
           boxShadow: theme.shadows[5],
           display: "flex",
           flexDirection: "column",
-          minWidth: "320px",
-          maxWidth: "90%",
+          width: "90%", // Set width to 90% of the viewport
+          maxWidth: "500px", // Maximum width for larger screens
+          maxHeight: "80vh", // Max height to ensure it fits in the viewport
+          overflowY: "auto", // Scroll inside the form if content is too tall
           color: theme.palette.text.primary,
           border: `4px solid ${theme.palette.primary.main}`,
           borderRadius: theme.shape.borderRadius,
           textAlign: "center",
-          gap: theme.spacing(2),
+          gap: theme.spacing(1), // Reduced gap to save space
           zIndex: theme.zIndex.modal + 1,
         }}
       >
@@ -126,13 +135,46 @@ const CustomerDetail = ({ customer, onClose, onSave, onMove, onDelete }) => {
           fullWidth
         />
         <TextField
-          label="Tasks"
-          name="tasks"
-          value={details.tasks}
+          label="Email Address"
+          name="email"
+          value={details.email}
+          onChange={handleChange}
+          variant="outlined"
+          fullWidth
+        />
+        <TextField
+          label="Tasks 1"
+          name="tasks1"
+          value={details.tasks1}
+          onChange={handleChange}
+          variant="outlined"
+          fullWidth
+        />
+        <TextField
+          label="Tasks 2"
+          name="tasks2"
+          value={details.tasks2}
+          onChange={handleChange}
+          variant="outlined"
+          fullWidth
+        />
+        <TextField
+          label="Tasks 3"
+          name="tasks3"
+          value={details.tasks3}
+          onChange={handleChange}
+          variant="outlined"
+          fullWidth
+        />
+        <TextField
+          label="Notes"
+          name="notes"
+          value={details.notes}
           onChange={handleChange}
           variant="outlined"
           fullWidth
           multiline
+          rows={4}
         />
         <TextField
           label="Total Price"
@@ -168,9 +210,17 @@ const CustomerDetail = ({ customer, onClose, onSave, onMove, onDelete }) => {
           <Button variant="contained" color="primary" onClick={handleSave}>
             Save
           </Button>
-          <Button variant="contained" color="secondary" onClick={handleOpen}>
+          <Button
+            variant="contained"
+            sx={{
+              bgcolor: theme.palette.error.main,
+              "&:hover": { bgcolor: theme.palette.error.dark },
+            }}
+            onClick={handleOpen}
+          >
             Delete
           </Button>
+
           <Button variant="outlined" onClick={onClose}>
             Close
           </Button>
@@ -190,7 +240,14 @@ const CustomerDetail = ({ customer, onClose, onSave, onMove, onDelete }) => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleDelete} color="secondary">
+          <Button
+            variant="contained"
+            sx={{
+              bgcolor: theme.palette.error.main,
+              "&:hover": { bgcolor: theme.palette.error.dark },
+            }}
+            onClick={handleDelete}
+          >
             Delete
           </Button>
         </DialogActions>

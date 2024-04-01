@@ -15,7 +15,7 @@ const Layout = ({ children }) => {
       }}
     >
       <Header />
-      <Container component="main" sx={{ mt: 2, mb: 2, flexGrow: 1 }}>
+      <Container component="main" sx={{ mt: 9, mb: 2, flexGrow: 1 }}>
         {children}
       </Container>
       <Footer />

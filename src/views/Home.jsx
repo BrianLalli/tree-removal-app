@@ -37,7 +37,7 @@ const HomePage = () => {
           fontWeight: 700,
           fontSize: { xs: '2.5rem', sm: '2.5rem', md: '4rem' },
           lineHeight: 1.0,
-          mt: 0,
+          mt: 10,
         }}
       >
         Tree removal made easy
