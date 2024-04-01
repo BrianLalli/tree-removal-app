@@ -1,12 +1,12 @@
-import "./App.css";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { AppContextProvider } from "./context/appContext";
-import Login from "./views/Login";
-import Home from "./views/Home";
-import Header from "./components/Header";
-import ProtectedRoute from "./components/ProtectedRoute";
-import Footer from "./components/Footer";
-import WorkingBoard from "./views/WorkingBoard";
+import React from 'react';
+import './App.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AppContextProvider } from './context/appContext';
+import Login from './views/Login';
+import Home from './views/Home';
+import ProtectedRoute from './components/ProtectedRoute';
+import Layout from '../src/layout';
+import WorkingBoard from './views/WorkingBoard';
 
 function App() {
   return (
@@ -16,21 +16,20 @@ function App() {
           <Route
             element={
               <ProtectedRoute>
-                <Header />
-                <Home />
-                <Footer />
+                <Layout>
+                  <Home />
+                </Layout>
               </ProtectedRoute>
             }
             path="/"
           />
           <Route element={<Login />} path="/login" />
-          // New route for the WorkingBoard component
           <Route
             element={
               <ProtectedRoute>
-                <Header />
-                <WorkingBoard />
-                <Footer />
+                <Layout>
+                  <WorkingBoard />
+                </Layout>
               </ProtectedRoute>
             }
             path="/working-board"
