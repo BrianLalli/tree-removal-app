@@ -190,7 +190,7 @@ const CustomerDetail = ({ customer, onClose, refetch, onMove }) => {
         <TextField
           label="Tasks 3"
           name="tasks3"
-          value={details.tasks2}
+          value={details.tasks[2]}
           onChange={handleChange}
           variant="outlined"
           fullWidth
