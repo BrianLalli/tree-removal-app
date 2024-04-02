@@ -13,6 +13,11 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
+import {
+  archiveCustomer,
+  restoreCustomer,
+  saveCustomer,
+} from "../api/customers";
 
 const statusOptions = {
   "group-1": "Opportunities",
@@ -21,56 +26,80 @@ const statusOptions = {
   "group-4": "Completed Jobs",
 };
 
-const CustomerDetail = ({ customer, onClose, onSave, onMove, onDelete }) => {
+const initialCustomerState = {
+  id: null,
+  name: "",
+  phoneNumber: "",
+  address: "",
+  email: "",
+  tasks: ["", "", ""],
+  totalPrice: "",
+  notes: "",
+  status: "group-1",
+};
+
+const CustomerDetail = ({ customer, onClose, refetch, onMove }) => {
   const theme = useTheme();
-  const [details, setDetails] = useState({
-    name: customer.content,
-    phoneNumber: "",
-    address: "",
-    email: "",
-    tasks1: "",
-    tasks2: "",
-    tasks3: "",
-    totalPrice: "",
-    notes: "",
-    status: customer.groupId || "group-1",
-  });
+  const [details, setDetails] = useState(initialCustomerState);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const savedDetails = localStorage.getItem(customer.id);
-    if (savedDetails) {
-      setDetails({ ...JSON.parse(savedDetails), status: customer.groupId });
-    }
-  }, [customer.id, customer.groupId]);
+    if (customer.name) setDetails(customer);
+  }, []);
+
+  // useEffect(() => {
+  //   const savedDetails = localStorage.getItem(customer.id);
+  //   if (savedDetails) {
+  //     setDetails({ ...JSON.parse(savedDetails), status: customer.groupId });
+  //   }
+  // }, [customer.id, customer.groupId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setDetails((prevDetails) => ({
-      ...prevDetails,
-      [name]: value,
-    }));
+    if (name.includes("task")) {
+      const taskIndex = +name.replace("tasks", "") - 1;
+      let newTasks = details.tasks.map((task, index) => {
+        if (index === taskIndex) return value;
+        return task;
+      });
+      setDetails((prevDetails) => ({
+        ...prevDetails,
+        tasks: newTasks,
+      }));
+    } else {
+      setDetails((prevDetails) => ({
+        ...prevDetails,
+        [name]: value,
+      }));
+    }
   };
 
   const handleStatusChange = (event) => {
     setDetails({ ...details, status: event.target.value });
   };
 
-  const handleSave = () => {
-    onSave(customer.id, details);
+  const handleSave = async () => {
+    await saveCustomer(details);
     if (details.status !== customer.groupId) {
       onMove(customer.id, details.status);
     }
+    refetch();
     onClose();
   };
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handleDelete = () => {
-    onDelete(customer.id);
+  const handleDelete = async () => {
+    await archiveCustomer({ id: customer.id });
+    refetch();
     handleClose();
-    onClose();
+  };
+
+  const handleRestore = async () => {
+    await restoreCustomer({ id: customer.id });
+    refetch();
+    handleClose();
   };
 
   return (
@@ -145,7 +174,7 @@ const CustomerDetail = ({ customer, onClose, onSave, onMove, onDelete }) => {
         <TextField
           label="Tasks 1"
           name="tasks1"
-          value={details.tasks1}
+          value={details.tasks[0]}
           onChange={handleChange}
           variant="outlined"
           fullWidth
@@ -153,7 +182,7 @@ const CustomerDetail = ({ customer, onClose, onSave, onMove, onDelete }) => {
         <TextField
           label="Tasks 2"
           name="tasks2"
-          value={details.tasks2}
+          value={details.tasks[1]}
           onChange={handleChange}
           variant="outlined"
           fullWidth
@@ -161,7 +190,7 @@ const CustomerDetail = ({ customer, onClose, onSave, onMove, onDelete }) => {
         <TextField
           label="Tasks 3"
           name="tasks3"
-          value={details.tasks3}
+          value={details.tasks2}
           onChange={handleChange}
           variant="outlined"
           fullWidth
@@ -210,16 +239,30 @@ const CustomerDetail = ({ customer, onClose, onSave, onMove, onDelete }) => {
           <Button variant="contained" color="primary" onClick={handleSave}>
             Save
           </Button>
-          <Button
-            variant="contained"
-            sx={{
-              bgcolor: theme.palette.error.main,
-              "&:hover": { bgcolor: theme.palette.error.dark },
-            }}
-            onClick={handleOpen}
-          >
-            Delete
-          </Button>
+
+          {details.archived ? (
+            <Button
+              variant="contained"
+              sx={{
+                bgcolor: theme.palette.warning.main,
+                "&:hover": { bgcolor: theme.palette.warning.dark },
+              }}
+              onClick={handleRestore}
+            >
+              Restore
+            </Button>
+          ) : (
+            <Button
+              variant="contained"
+              sx={{
+                bgcolor: theme.palette.error.main,
+                "&:hover": { bgcolor: theme.palette.error.dark },
+              }}
+              onClick={handleOpen}
+            >
+              Archive
+            </Button>
+          )}
 
           <Button variant="outlined" onClick={onClose}>
             Close
@@ -235,7 +278,7 @@ const CustomerDetail = ({ customer, onClose, onSave, onMove, onDelete }) => {
         <DialogTitle id="alert-dialog-title">{"Confirm Deletion"}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete this customer?
+            Are you sure you want to archive this customer?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -248,7 +291,7 @@ const CustomerDetail = ({ customer, onClose, onSave, onMove, onDelete }) => {
             }}
             onClick={handleDelete}
           >
-            Delete
+            Archive
           </Button>
         </DialogActions>
       </Dialog>
