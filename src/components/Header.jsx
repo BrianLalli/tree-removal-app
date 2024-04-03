@@ -14,6 +14,7 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import supabase from "../utils/supabaseClient";
 import logo from "../assets/images/logo.png";
+import { Link } from "react-router-dom";
 
 function HideOnScroll(props) {
   const { children } = props;
@@ -70,14 +71,16 @@ const Header = () => {
                 flexGrow: 1,
               }}
             >
-              <img
-                src={logo}
-                alt="Two Guys Tree Service"
-                style={{
-                  height: "50px", // Adjust as needed
-                  width: "auto",
-                }}
-              />
+              <Link to="/" style={{ textDecoration: "none" }}>
+                <img
+                  src={logo}
+                  alt="Two Guys Tree Service"
+                  style={{
+                    height: "50px", // Adjust as needed
+                    width: "auto",
+                  }}
+                />
+              </Link>
               {/* The rest of your items (if any) would go here */}
             </Box>
             {/* Logout Button aligned to the right */}
