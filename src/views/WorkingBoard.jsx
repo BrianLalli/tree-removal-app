@@ -7,9 +7,11 @@ import CustomerDetail from "../components/CustomerDetail";
 import SearchBar from "../components/SearchBar";
 import { getCustomers, updateCustomerStatus } from "../api/customers";
 import _ from "lodash";
+import JobDetail from "../components/JobDetail";
+import { getJobs, updateJobStatus } from "../api/jobs";
 
 const WorkingBoard = () => {
-  const initialCustomerGroups = {
+  const initialGroups = {
     "group-1": {
       id: "group-1",
       name: "Opportunities",
@@ -38,41 +40,51 @@ const WorkingBoard = () => {
   const [customerGroups, setCustomerGroups] = useState({});
   const theme = useTheme();
   const [editingCustomer, setEditingCustomer] = useState(null);
+  const [editingJob, setEditingJob] = useState(null);
   const [customers, setCustomers] = useState([]);
-  const [refetchCustomers, setRefetchCustomers] = useState(false);
+  const [refetchData, setRefetchData] = useState(false);
 
   useEffect(() => {
-    async function fetchCustomersOnMount() {
-      let groups = _.cloneDeep(initialCustomerGroups);
+    async function fetchCustomersAndJobsOnMount() {
+      let groups = _.cloneDeep(initialGroups);
       const customers = await getCustomers();
-      customers.map((customer) => {
-        if (!customer?.archived) {
-          groups[customer.status]?.items?.push(customer);
+      const jobs = await getJobs();
+      jobs.map((job) => {
+        if (!job?.archived) {
+          groups[job.status]?.items?.push(job);
+        }
+        const customer = customers.find(
+          (customer) => customer.id === job.customerId
+        );
+        if (customer) {
+          customer.jobs = customer.jobs || [];
+          customer.jobs.push(job);
         }
       });
       setCustomers(customers);
       setCustomerGroups(groups);
     }
-    fetchCustomersOnMount();
+    fetchCustomersAndJobsOnMount();
   }, []);
 
   useEffect(() => {
-    async function refetchCustomersOnUpdate() {
-      if (refetchCustomers) {
-        let groups = _.cloneDeep(initialCustomerGroups);
+    async function refetchDataOnUpdate() {
+      if (refetchData) {
+        let groups = _.cloneDeep(initialGroups);
         const customers = await getCustomers();
-        customers.map((customer) => {
-          if (!customer?.archived) {
-            groups[customer.status]?.items?.push(customer);
+        const jobs = await getJobs();
+        jobs.map((job) => {
+          if (!job?.archived) {
+            groups[job.status]?.items?.push(job);
           }
         });
         setCustomers(customers);
         setCustomerGroups(groups);
-        setRefetchCustomers(false);
+        setRefetchData(false);
       }
     }
-    refetchCustomersOnUpdate();
-  }, [refetchCustomers]);
+    refetchDataOnUpdate();
+  }, [refetchData]);
 
   const reorder = (list, startIndex, endIndex) => {
     const result = Array.from(list);
@@ -129,7 +141,7 @@ const WorkingBoard = () => {
           items: destClone,
         },
       };
-      updateCustomerStatus({
+      updateJobStatus({
         id: result.draggableId,
         status: destination.droppableId,
       });
@@ -139,14 +151,15 @@ const WorkingBoard = () => {
 
   const handleCloseDetail = () => {
     setEditingCustomer(null);
+    setEditingJob(null);
   };
 
   const refetch = () => {
-    setRefetchCustomers(true);
+    setRefetchData(true);
     handleCloseDetail();
   };
 
-  const handleMoveCustomer = (customerId, newGroupId) => {
+  const handleMoveJob = (customerId, newGroupId) => {
     setCustomerGroups((prevGroups) => {
       const newGroups = { ...prevGroups };
       let movedCustomer = null;
@@ -171,20 +184,6 @@ const WorkingBoard = () => {
     });
   };
 
-  const addNewCustomer = () => {
-    const newCustomer = {
-      content: "New Customer",
-    };
-
-    setCustomerGroups((prev) => ({
-      ...prev,
-      "group-1": {
-        ...prev["group-1"],
-        items: [...prev["group-1"].items, newCustomer],
-      },
-    }));
-  };
-
   const handleDeleteCustomer = (customerId) => {
     setCustomerGroups((prevGroups) => {
       Object.keys(prevGroups).forEach((group) => {
@@ -197,8 +196,19 @@ const WorkingBoard = () => {
       });
       return { ...prevGroups };
     });
-    // Remove customer details from localStorage
-    // localStorage.removeItem(customerId);
+  };
+  const handleDeleteJob = (jobId) => {
+    setCustomerGroups((prevGroups) => {
+      Object.keys(prevGroups).forEach((group) => {
+        const index = prevGroups[group].items.findIndex(
+          (item) => item.id === jobId
+        );
+        if (index !== -1) {
+          prevGroups[group].items.splice(index, 1);
+        }
+      });
+      return { ...prevGroups };
+    });
   };
 
   return (
@@ -220,6 +230,15 @@ const WorkingBoard = () => {
             onClick={setEditingCustomer}
           >
             + New Customer
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            style={{ width: "200px", margin: "auto", marginBottom: 15 }}
+            sx={{ mt: 1 }}
+            onClick={setEditingJob}
+          >
+            + New Job
           </Button>
           <SearchBar
             onSelect={setEditingCustomer}
@@ -271,10 +290,10 @@ const WorkingBoard = () => {
                     {group.name}
                   </Typography>
                   {group.items &&
-                    group.items.map((customer, index) => (
+                    group.items.map((job, index) => (
                       <Draggable
-                        key={customer.id}
-                        draggableId={customer.id.toString()}
+                        key={job.id}
+                        draggableId={job.id.toString()}
                         index={index}
                       >
                         {(provided, snapshot) => (
@@ -282,9 +301,7 @@ const WorkingBoard = () => {
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
-                            onDoubleClick={() =>
-                              setEditingCustomer({ ...customer })
-                            }
+                            onDoubleClick={() => setEditingJob({ ...job })}
                             sx={{
                               backgroundColor: snapshot.isDragging
                                 ? alpha(theme.palette.action.hover, 0.8)
@@ -299,7 +316,7 @@ const WorkingBoard = () => {
                               ),
                             }}
                           >
-                            {customer.name}
+                            {job.name}
                           </Box>
                         )}
                       </Draggable>
@@ -313,10 +330,21 @@ const WorkingBoard = () => {
         {editingCustomer && (
           <CustomerDetail
             customer={editingCustomer}
+            setEditingJob={setEditingJob}
             onClose={handleCloseDetail}
             refetch={refetch}
-            onMove={handleMoveCustomer}
             onDelete={handleDeleteCustomer}
+          />
+        )}
+        {editingJob && (
+          <JobDetail
+            job={editingJob}
+            customers={customers}
+            setEditingCustomer={setEditingCustomer}
+            onClose={handleCloseDetail}
+            refetch={refetch}
+            onMove={handleMoveJob}
+            onDelete={handleDeleteJob}
           />
         )}
       </DragDropContext>

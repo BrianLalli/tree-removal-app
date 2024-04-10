@@ -3,17 +3,22 @@ import {
   useTheme,
   TextField,
   Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-import {
-  archiveCustomer,
-  restoreCustomer,
-  saveCustomer,
-} from "../api/customers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { archiveJob, restoreJob, saveJob } from "../api/jobs";
+import Typeahead from "./Typeahead";
+import dayjs from "dayjs";
 
 const statusOptions = {
   "group-1": "Opportunities",
@@ -22,51 +27,107 @@ const statusOptions = {
   "group-4": "Completed Jobs",
 };
 
-const initialCustomerState = {
+const initialJobState = {
   id: null,
   name: "",
-  phoneNumber: "",
-  address: "",
-  email: "",
   tasks: ["", "", ""],
-  totalPrice: "",
   notes: "",
+  jobDate: "",
+  durationInHours: 0,
+  price: "",
+  customerId: null,
+  customerSigned: false,
+  status: "group-1",
 };
 
-const CustomerDetail = ({ customer, onClose, refetch, setEditingJob }) => {
+const JobDetail = ({
+  job,
+  customers,
+  onClose,
+  refetch,
+  onMove,
+  setEditingCustomer,
+}) => {
   const theme = useTheme();
-  const [details, setDetails] = useState(initialCustomerState);
+  const [details, setDetails] = useState(initialJobState);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (customer.name) setDetails(customer);
+    if (job.id) {
+      setDetails(job);
+      handleCustomerChange(job.customerId);
+      handleJobDateChange(job.jobDate);
+    }
   }, []);
+
+  useEffect(() => {
+    console.log(details);
+  }, [details]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name.includes("task")) {
+      const taskIndex = +name.replace("tasks", "") - 1;
+      let newTasks = details.tasks.map((task, index) => {
+        if (index === taskIndex) return value;
+        return task;
+      });
+      setDetails((prevDetails) => ({
+        ...prevDetails,
+        tasks: newTasks,
+      }));
+    } else {
+      setDetails((prevDetails) => ({
+        ...prevDetails,
+        [name]: value,
+      }));
+    }
+  };
+
+  const handleCustomerChange = (customerId) => {
     setDetails((prevDetails) => ({
       ...prevDetails,
-      [name]: value,
+      customerId,
+    }));
+  };
+  const handleJobDateChange = (jobDate) => {
+    setDetails((prevDetails) => ({
+      ...prevDetails,
+      jobDate,
     }));
   };
 
+  const handleStatusChange = (event) => {
+    setDetails({ ...details, status: event.target.value });
+  };
+
   const handleSave = async () => {
-    await saveCustomer(details);
+    await saveJob(details);
+    if (details.status !== job.groupId) {
+      onMove(job.id, details.status);
+    }
     refetch();
     onClose();
+  };
+
+  const handleViewCustomer = async () => {
+    onClose();
+    setEditingCustomer(
+      customers.filter((customer) => customer.id == details.customerId)[0]
+    );
   };
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   const handleDelete = async () => {
-    await archiveCustomer({ id: customer.id });
+    await archiveJob({ id: job.id });
     refetch();
     handleClose();
   };
 
   const handleRestore = async () => {
-    await restoreCustomer({ id: customer.id });
+    await restoreJob({ id: job.id });
     refetch();
     handleClose();
   };
@@ -108,8 +169,16 @@ const CustomerDetail = ({ customer, onClose, refetch, setEditingJob }) => {
           zIndex: theme.zIndex.modal + 1,
         }}
       >
+        <Typeahead
+          label="Customer"
+          data={customers}
+          onSelection={(e) => handleCustomerChange(e.id)}
+          defaultValue={
+            customers.filter((item) => item.id == job.customerId)[0]
+          }
+        />
         <TextField
-          label="Name"
+          label="Job Name"
           name="name"
           value={details.name}
           onChange={handleChange}
@@ -117,45 +186,80 @@ const CustomerDetail = ({ customer, onClose, refetch, setEditingJob }) => {
           fullWidth
         />
         <TextField
-          label="Phone Number"
-          name="phoneNumber"
-          value={details.phoneNumber}
+          label="Tasks 1"
+          name="tasks1"
+          value={details.tasks[0]}
           onChange={handleChange}
           variant="outlined"
           fullWidth
         />
         <TextField
-          label="Address"
-          name="address"
-          value={details.address}
+          label="Tasks 2"
+          name="tasks2"
+          value={details.tasks[1]}
           onChange={handleChange}
           variant="outlined"
           fullWidth
         />
         <TextField
-          label="Email Address"
-          name="email"
-          value={details.email}
+          label="Tasks 3"
+          name="tasks3"
+          value={details.tasks[2]}
           onChange={handleChange}
           variant="outlined"
           fullWidth
         />
-        <span>Jobs</span>
-        {details?.jobs &&
-          details?.jobs.map((job, index) => {
-            return (
-              <Button
-                key={job + index}
-                variant="contained"
-                color="primary"
-                onClick={() => setEditingJob(job)}
-              >
-                {`${job.name}: ${job.jobDate.split("T")[0]} (${
-                  statusOptions[job.status]
-                })`}
-              </Button>
-            );
-          })}
+        <TextField
+          label="Notes"
+          name="notes"
+          value={details.notes}
+          onChange={handleChange}
+          variant="outlined"
+          fullWidth
+          multiline
+          rows={4}
+        />
+        <TextField
+          label="Price"
+          name="price"
+          value={details.price}
+          onChange={handleChange}
+          variant="outlined"
+          fullWidth
+        />
+        <TextField
+          label="Duration In Hours"
+          name="durationInHours"
+          value={details.durationInHours}
+          onChange={handleChange}
+          variant="outlined"
+          fullWidth
+        />
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DateTimePicker
+            label="Job Date and Time"
+            value={dayjs(Date.parse(details.jobDate))}
+            onChange={(newValue) => {
+              handleJobDateChange(new Date(newValue.$d));
+            }}
+          />
+        </LocalizationProvider>
+        <FormControl fullWidth margin="normal">
+          <InputLabel id="status-select-label">Status</InputLabel>
+          <Select
+            labelId="status-select-label"
+            id="status-select"
+            value={details.status}
+            label="Status"
+            onChange={handleStatusChange}
+          >
+            {Object.keys(statusOptions).map((groupId) => (
+              <MenuItem value={groupId} key={groupId}>
+                {statusOptions[groupId]}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
         <div
           style={{
             display: "flex",
@@ -165,6 +269,13 @@ const CustomerDetail = ({ customer, onClose, refetch, setEditingJob }) => {
         >
           <Button variant="contained" color="primary" onClick={handleSave}>
             Save
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleViewCustomer}
+          >
+            View Customer
           </Button>
 
           {details.archived ? (
@@ -205,7 +316,7 @@ const CustomerDetail = ({ customer, onClose, refetch, setEditingJob }) => {
         <DialogTitle id="alert-dialog-title">{"Confirm Deletion"}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to archive this customer?
+            Are you sure you want to archive this job?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -226,4 +337,4 @@ const CustomerDetail = ({ customer, onClose, refetch, setEditingJob }) => {
   );
 };
 
-export default CustomerDetail;
+export default JobDetail;

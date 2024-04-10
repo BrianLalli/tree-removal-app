@@ -1,12 +1,12 @@
-import React from 'react';
-import './App.css';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AppContextProvider } from './context/appContext';
-import Login from './views/Login';
-import Home from './views/Home';
-import ProtectedRoute from './components/ProtectedRoute';
-import Layout from '../src/layout';
-import WorkingBoard from './views/WorkingBoard';
+import React from "react";
+import "./App.css";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AppContextProvider } from "./context/appContext";
+import Login from "./views/Login";
+import Home from "./views/Home";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Layout from "../src/layout";
+import WorkingBoard from "./views/WorkingBoard";
 
 function App() {
   return (
