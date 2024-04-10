@@ -32,7 +32,7 @@ const initialJobState = {
   name: "",
   tasks: ["", "", ""],
   notes: "",
-  jobDate: "",
+  jobDate: new Date(),
   durationInHours: 0,
   price: "",
   customerId: null,
@@ -59,10 +59,6 @@ const JobDetail = ({
       handleJobDateChange(job.jobDate);
     }
   }, []);
-
-  useEffect(() => {
-    console.log(details);
-  }, [details]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

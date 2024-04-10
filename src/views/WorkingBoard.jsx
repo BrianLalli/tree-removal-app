@@ -77,6 +77,13 @@ const WorkingBoard = () => {
           if (!job?.archived) {
             groups[job.status]?.items?.push(job);
           }
+          const customer = customers.find(
+            (customer) => customer.id === job.customerId
+          );
+          if (customer) {
+            customer.jobs = customer.jobs || [];
+            customer.jobs.push(job);
+          }
         });
         setCustomers(customers);
         setCustomerGroups(groups);
