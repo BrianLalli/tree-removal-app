@@ -6,10 +6,9 @@ import {
   Button,
   Container,
   MenuItem,
-  Typography,
-  Drawer,
   Slide,
   useScrollTrigger,
+  Drawer,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import supabase from "../utils/supabaseClient";
@@ -74,19 +73,24 @@ const Header = () => {
               <Link to="/" style={{ textDecoration: "none" }}>
                 <img
                   src={logo}
-                  alt="Two Guys Tree Service"
+                  alt="Company Logo"
                   style={{
-                    height: "50px", // Adjust as needed
+                    height: "50px",
                     width: "auto",
                   }}
                 />
               </Link>
               {/* The rest of your items (if any) would go here */}
             </Box>
-            {/* Logout Button aligned to the right */}
+            {/* Logout and Calendar Buttons aligned to the right */}
             <Box
               sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}
             >
+              <Link to="/calendar" style={{ textDecoration: "none", marginRight: "10px" }}>
+                <Button color="primary" variant="contained">
+                  Calendar
+                </Button>
+              </Link>
               <Button
                 color="primary"
                 variant="contained"
@@ -113,6 +117,9 @@ const Header = () => {
                 onClick={toggleDrawer(false)}
                 onKeyDown={toggleDrawer(false)}
               >
+                <Link to="/calendar" style={{ textDecoration: "none" }}>
+                  <MenuItem>Calendar</MenuItem>
+                </Link>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
               </Box>
             </Drawer>
