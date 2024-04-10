@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import supabase from "../utils/supabaseClient";
-import logo from "../assets/images/logo.png";
+import logo from "../assets/images/logo-with-letters.png";
 import { Link } from "react-router-dom";
 
 function HideOnScroll(props) {
