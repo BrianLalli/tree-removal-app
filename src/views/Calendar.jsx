@@ -3,10 +3,31 @@ import { useTheme } from '@mui/material/styles';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+// Ensure you import the CSS correctly. The path must match your project structure.
+import '../assets/styles/Calendar.css'; // Adjusted import statement
 import { getJobs, updateJobStatus } from '../api/jobs';
 import JobDetail from '../components/JobDetail';
+import { useSwipeable } from 'react-swipeable'; // Import useSwipeable for swipe gestures
 
 const localizer = momentLocalizer(moment);
+
+const eventStyleGetter = (event, start, end, isSelected) => {
+  let backgroundColor = '#3174ad'; // Default color
+  if (event.resource.status === 'group-3') {
+    backgroundColor = '#5cb85c'; // Green for upcoming jobs
+  }
+
+  const style = {
+    backgroundColor,
+    borderRadius: '6px',
+    opacity: 0.8,
+    color: 'black',
+    border: '0px',
+    display: 'block',
+  };
+
+  return { style };
+};
 
 const MyCalendar = () => {
   const theme = useTheme();
@@ -19,19 +40,15 @@ const MyCalendar = () => {
 
   const fetchJobs = async () => {
     const fetchedJobs = await getJobs();
-    // Filter jobs for those with a status of "group-3" (Upcoming Jobs)
     const filteredJobs = fetchedJobs.filter(job => job.status === "group-3");
-    const calendarEvents = filteredJobs.map(job => {
-      return {
-        id: job.id,
-        title: job.name,
-        // Convert times from UTC to local time zone for display
-        start: moment.utc(job.jobDate).local().toDate(),
-        end: moment.utc(job.jobDate).add(job.durationInHours, 'hours').local().toDate(),
-        allDay: false,
-        resource: job,
-      };
-    });
+    const calendarEvents = filteredJobs.map(job => ({
+      id: job.id,
+      title: job.name,
+      start: moment.utc(job.jobDate).local().toDate(),
+      end: moment.utc(job.jobDate).add(job.durationInHours, 'hours').local().toDate(),
+      allDay: false,
+      resource: job,
+    }));
     setJobs(calendarEvents);
   };
 
@@ -40,7 +57,6 @@ const MyCalendar = () => {
   };
 
   const handleEventChange = async ({ event, start, end }) => {
-    // Use moment to ensure start and end times are in UTC for submission
     const updatedJob = {
       ...event.resource,
       jobDate: moment(start).utc().format(),
@@ -48,34 +64,43 @@ const MyCalendar = () => {
     };
   
     await updateJobStatus(updatedJob);
-    fetchJobs(); // Refresh the job list
+    fetchJobs();
   };
-  
 
   const handleJobDeletion = (jobId) => {
     setJobs(prevJobs => prevJobs.filter(job => job.id !== jobId));
   };
 
   const handleJobMove = async (jobId, newStatus) => {
-    // Placeholder for moving job to a different status
-    // Update the job status in your database accordingly
     console.log(`Moving job ${jobId} to status ${newStatus}`);
-    fetchJobs(); // Refresh the jobs list after updating the status
+    fetchJobs();
   };
 
   const handleEditingCustomer = (customer) => {
     console.log("Editing customer:", customer);
-    // Placeholder function for editing customer
   };
 
   const calendarStyles = {
-    height: '100vh',
+    height: 'calc(100vh - var(--header-height) - var(--footer-height))',
+    padding: theme.spacing(2),
     backgroundColor: theme.palette.background.default,
     color: theme.palette.text.primary,
+    borderRadius: theme.shape.borderRadius,
+    width: '100%',
+    overflow: 'auto',
+    boxSizing: 'border-box',
   };
+  
+  
+  const handlers = useSwipeable({
+    onSwipedLeft: () => console.log('Swiped left'), // Placeholder for actual implementation
+    onSwipedRight: () => console.log('Swiped right'), // Placeholder for actual implementation
+    preventDefaultTouchmoveEvent: true,
+    trackMouse: true,
+  });
 
   return (
-    <div style={calendarStyles}>
+    <div {...handlers} style={calendarStyles}>
       <Calendar
         localizer={localizer}
         events={jobs}
@@ -87,6 +112,7 @@ const MyCalendar = () => {
         resizable
         selectable
         style={{ height: '100%' }}
+        eventPropGetter={eventStyleGetter}
       />
       {selectedJob && (
         <JobDetail

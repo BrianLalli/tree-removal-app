@@ -1,0 +1,17 @@
+/* Add this at the bottom of your CSS file */
+@media (max-width: 600px) {
+    .rbc-calendar {
+      font-size: 14px;
+    }
+    .rbc-event {
+      padding: 8px;
+      font-size: 12px;
+      border-radius: 4px; /* Make it a bit more touch-friendly */
+    }
+    .rbc-event-content {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis; /* Ensure text doesn't overflow */
+    }
+  }
+  
