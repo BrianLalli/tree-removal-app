@@ -19,14 +19,19 @@ const MyCalendar = () => {
 
   const fetchJobs = async () => {
     const fetchedJobs = await getJobs();
-    const calendarEvents = fetchedJobs.map(job => ({
-      id: job.id,
-      title: job.name,
-      start: new Date(job.jobDate),
-      end: new Date(moment(job.jobDate).add(job.durationInHours, 'hours')),
-      allDay: false,
-      resource: job,
-    }));
+    // Filter jobs for those with a status of "group-3" (Upcoming Jobs)
+    const filteredJobs = fetchedJobs.filter(job => job.status === "group-3");
+    const calendarEvents = filteredJobs.map(job => {
+      return {
+        id: job.id,
+        title: job.name,
+        // Convert times from UTC to local time zone for display
+        start: moment.utc(job.jobDate).local().toDate(),
+        end: moment.utc(job.jobDate).add(job.durationInHours, 'hours').local().toDate(),
+        allDay: false,
+        resource: job,
+      };
+    });
     setJobs(calendarEvents);
   };
 
@@ -35,29 +40,32 @@ const MyCalendar = () => {
   };
 
   const handleEventChange = async ({ event, start, end }) => {
+    // Use moment to ensure start and end times are in UTC for submission
     const updatedJob = {
       ...event.resource,
-      jobDate: start,
-      durationInHours: moment(end).diff(moment(start), 'hours'),
+      jobDate: moment(start).utc().format(),
+      durationInHours: moment.utc(end).diff(moment.utc(start), 'hours'),
     };
-
+  
     await updateJobStatus(updatedJob);
-    fetchJobs(); // Refresh jobs list to reflect the updated job
+    fetchJobs(); // Refresh the job list
   };
+  
 
   const handleJobDeletion = (jobId) => {
     setJobs(prevJobs => prevJobs.filter(job => job.id !== jobId));
   };
 
-  // Adapted to the calendar context, for now, just refetching jobs, but could be enhanced
-  const handleJobMove = (jobId, newStatus) => {
-    fetchJobs();
+  const handleJobMove = async (jobId, newStatus) => {
+    // Placeholder for moving job to a different status
+    // Update the job status in your database accordingly
+    console.log(`Moving job ${jobId} to status ${newStatus}`);
+    fetchJobs(); // Refresh the jobs list after updating the status
   };
 
   const handleEditingCustomer = (customer) => {
-    // This could open a modal or trigger another component
-    // For now, it's just logging
     console.log("Editing customer:", customer);
+    // Placeholder function for editing customer
   };
 
   const calendarStyles = {
