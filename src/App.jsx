@@ -7,6 +7,7 @@ import Home from "./views/Home";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "../src/layout";
 import WorkingBoard from "./views/WorkingBoard";
+import Calendar from "./views/Calendar"; // Make sure this path is correct
 
 function App() {
   return (
@@ -33,6 +34,17 @@ function App() {
               </ProtectedRoute>
             }
             path="/working-board"
+          />
+          {/* Add this new Route for the Calendar view */}
+          <Route
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Calendar />
+                </Layout>
+              </ProtectedRoute>
+            }
+            path="/calendar"
           />
         </Routes>
       </Router>
