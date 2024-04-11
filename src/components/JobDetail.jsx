@@ -41,8 +41,8 @@ const initialJobState = {
 };
 
 const JobDetail = ({
-  job,
-  customers,
+  job = {},
+  customers = [],
   onClose,
   refetch,
   onMove,

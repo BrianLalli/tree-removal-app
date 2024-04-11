@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTheme } from '@mui/material/styles';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -8,51 +9,65 @@ import JobDetail from '../components/JobDetail';
 const localizer = momentLocalizer(moment);
 
 const MyCalendar = () => {
+  const theme = useTheme();
   const [jobs, setJobs] = useState([]);
   const [selectedJob, setSelectedJob] = useState(null);
 
-  // Fetch jobs and transform them into calendar events
   useEffect(() => {
-    async function fetchJobs() {
-      const fetchedJobs = await getJobs();
-      const calendarEvents = fetchedJobs.map(job => ({
-        id: job.id,
-        title: job.name,
-        start: new Date(job.jobDate),
-        end: new Date(moment(job.jobDate).add(job.durationInHours, 'hours')),
-        allDay: false,
-        resource: job,
-      }));
-      setJobs(calendarEvents);
-    }
-
     fetchJobs();
   }, []);
 
-  // Handler for clicking on a calendar event
+  const fetchJobs = async () => {
+    const fetchedJobs = await getJobs();
+    const calendarEvents = fetchedJobs.map(job => ({
+      id: job.id,
+      title: job.name,
+      start: new Date(job.jobDate),
+      end: new Date(moment(job.jobDate).add(job.durationInHours, 'hours')),
+      allDay: false,
+      resource: job,
+    }));
+    setJobs(calendarEvents);
+  };
+
   const handleSelectEvent = (event) => {
-    // Assuming JobDetail is a modal that takes a 'job' prop
     setSelectedJob(event.resource);
   };
 
-  // Handler for moving or resizing a calendar event
-  const handleEventChange = ({ event, start, end }) => {
+  const handleEventChange = async ({ event, start, end }) => {
     const updatedJob = {
       ...event.resource,
       jobDate: start,
-      // Assuming duration is in hours and can be recalculated as the difference between start and end times
       durationInHours: moment(end).diff(moment(start), 'hours'),
     };
 
-    // Update job in the database
-    updateJobStatus(updatedJob).then(() => {
-      // Update the local job state to reflect the change on the calendar
-      setJobs(jobs.map(j => j.id === event.id ? { ...j, start, end } : j));
-    });
+    await updateJobStatus(updatedJob);
+    fetchJobs(); // Refresh jobs list to reflect the updated job
+  };
+
+  const handleJobDeletion = (jobId) => {
+    setJobs(prevJobs => prevJobs.filter(job => job.id !== jobId));
+  };
+
+  // Adapted to the calendar context, for now, just refetching jobs, but could be enhanced
+  const handleJobMove = (jobId, newStatus) => {
+    fetchJobs();
+  };
+
+  const handleEditingCustomer = (customer) => {
+    // This could open a modal or trigger another component
+    // For now, it's just logging
+    console.log("Editing customer:", customer);
+  };
+
+  const calendarStyles = {
+    height: '100vh',
+    backgroundColor: theme.palette.background.default,
+    color: theme.palette.text.primary,
   };
 
   return (
-    <div style={{ height: '100vh' }}>
+    <div style={calendarStyles}>
       <Calendar
         localizer={localizer}
         events={jobs}
@@ -69,7 +84,10 @@ const MyCalendar = () => {
         <JobDetail
           job={selectedJob}
           onClose={() => setSelectedJob(null)}
-          // Pass additional props as needed for JobDetail component functionality
+          refetch={fetchJobs}
+          onMove={handleJobMove}
+          setEditingCustomer={handleEditingCustomer}
+          onDelete={handleJobDeletion}
         />
       )}
     </div>
