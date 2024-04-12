@@ -117,7 +117,7 @@ const Header = () => {
                 onClick={toggleDrawer(false)}
                 onKeyDown={toggleDrawer(false)}
               >
-                <Link to="/calendar" style={{ textDecoration: "none" }}>
+                <Link to="/calendar" style={{ color: "black" }}>
                   <MenuItem>Calendar</MenuItem>
                 </Link>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>

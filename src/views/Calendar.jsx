@@ -10,7 +10,7 @@ import JobDetail from "../components/JobDetail";
 import CustomerDetail from "../components/CustomerDetail";
 import { useSwipeable } from "react-swipeable";
 
-moment.tz.setDefault("America/New_York");
+const localTimeZone = moment.tz.guess() || "America/New_York";
 const localizer = momentLocalizer(moment);
 
 const eventStyleGetter = (event, start, end, isSelected) => {
@@ -44,17 +44,28 @@ const MyCalendar = () => {
 
   const fetchJobs = async () => {
     const fetchedJobs = await getJobs();
-    const filteredJobs = fetchedJobs.filter(job => job.status === "group-3");
-    const calendarEvents = filteredJobs.map(job => ({
-      id: job.id,
-      title: job.name,
-      start: moment.tz(job.jobDate, "UTC").tz("America/New_York").toDate(),
-      end: moment.tz(job.jobDate, "UTC").add(job.durationInHours, "hours").tz("America/New_York").toDate(),
-      allDay: false,
-      resource: job,
-    }));
+    console.log("Jobs fetched with dates:", fetchedJobs.map(job => ({
+      jobDate: job.jobDate,
+      timeZone: moment(job.jobDate).format('Z z') // Log timezone offset and abbreviation
+    })));
+  
+    const filteredJobs = fetchedJobs.filter((job) => job.status === 'group-3');
+    const calendarEvents = filteredJobs.map((job) => {
+      // Assume jobDate is already in local time, so just parse it directly without utc()
+      const startLocal = moment(job.jobDate).tz(localTimeZone, true); // the 'true' flag keeps the original time, interpreting it as local time
+      const endLocal = startLocal.clone().add(job.durationInHours, 'hours');
+      return {
+        id: job.id,
+        title: job.name,
+        start: startLocal.toDate(),
+        end: endLocal.toDate(),
+        allDay: false,
+        resource: job,
+      };
+    });
     setJobs(calendarEvents);
   };
+  
 
   const fetchCustomers = async () => {
     const fetchedCustomers = await getCustomers();
@@ -63,31 +74,22 @@ const MyCalendar = () => {
 
   const handleSelectEvent = (event) => {
     setSelectedJob(event.resource);
-    // New: Trigger CustomerDetail with the customer of the selected job
-    setEditingCustomer(event.resource.customer); // Assuming 'customer' is part of 'event.resource'
+    setEditingCustomer(event.resource.customer);
   };
 
   const handleEventChange = async ({ event, start, end }) => {
+    const startUTC = moment.tz(start, localTimeZone).utc().format();
+    const endUTC = moment.tz(end, localTimeZone).utc().format();
+    const durationInHours = moment(end).diff(moment(start), 'hours');
+
     const updatedJob = {
       ...event.resource,
-      jobDate: moment(start).tz("America/New_York").utc().format(),
-      durationInHours: moment(end).tz("America/New_York").diff(moment(start).tz("America/New_York"), "hours"),
+      jobDate: startUTC,
+      durationInHours: durationInHours,
     };
+
     await updateJobStatus(updatedJob);
-    fetchJobs();
-  };
-
-  const handleJobDeletion = (jobId) => {
-    setJobs(prevJobs => prevJobs.filter(job => job.id !== jobId));
-  };
-
-  const handleJobMove = async (jobId, newStatus) => {
-    console.log(`Moving job ${jobId} to status ${newStatus}`);
-    fetchJobs();
-  };
-
-  const handleEditingCustomer = (customer) => {
-    setEditingCustomer(customer);
+    fetchJobs(); // Re-fetch jobs to update the calendar with the correct times
   };
 
   const calendarStyles = {
@@ -128,9 +130,9 @@ const MyCalendar = () => {
           job={selectedJob}
           onClose={() => setSelectedJob(null)}
           refetch={fetchJobs}
-          onMove={handleJobMove}
-          setEditingCustomer={handleEditingCustomer}
-          onDelete={handleJobDeletion}
+          onMove={(jobId, newStatus) => console.log(`Moving job ${jobId} to status ${newStatus}`)}
+          setEditingCustomer={setEditingCustomer}
+          onDelete={(jobId) => setJobs(prevJobs => prevJobs.filter(job => job.id !== jobId))}
           customers={customers}
         />
       )}
