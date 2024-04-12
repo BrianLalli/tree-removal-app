@@ -147,12 +147,12 @@ const CustomerDetail = ({ customer, onClose, refetch, setEditingJob }) => {
               <Button
                 key={job + index}
                 variant="contained"
-                style={{ backgroundColor: job.archived ? "red" : null }}
+                color="primary"
                 onClick={() => setEditingJob(job)}
               >
                 {`${job.name}: ${job.jobDate.split("T")[0]} (${
                   statusOptions[job.status]
-                }) ${job.archived ? "Archived" : ""}`}
+                })`}
               </Button>
             );
           })}

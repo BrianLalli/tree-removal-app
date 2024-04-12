@@ -106,11 +106,10 @@ const JobDetail = ({
     onClose();
   };
 
-  const handleViewCustomer = async () => {
-    onClose();
-    setEditingCustomer(
-      customers.filter((customer) => customer.id == details.customerId)[0]
-    );
+  const handleViewCustomer = () => {
+    const selectedCustomer = customers.find((customer) => customer.id === details.customerId);
+    setEditingCustomer(selectedCustomer);
+    onClose();  // Close JobDetail when moving to CustomerDetail
   };
 
   const handleOpen = () => setOpen(true);
