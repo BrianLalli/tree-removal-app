@@ -9,7 +9,18 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-import { archiveCustomer, restoreCustomer, saveCustomer } from "../api/customers";
+import {
+  archiveCustomer,
+  restoreCustomer,
+  saveCustomer,
+} from "../api/customers";
+
+const statusOptions = {
+  "group-1": "Opportunities",
+  "group-2": "Pending",
+  "group-3": "Upcoming Jobs",
+  "group-4": "Completed Jobs",
+};
 
 const initialCustomerState = {
   id: null,
@@ -17,7 +28,9 @@ const initialCustomerState = {
   phoneNumber: "",
   address: "",
   email: "",
-  // totalPrice: "",
+  tasks: ["", "", ""],
+  totalPrice: "",
+  notes: "",
 };
 
 const CustomerDetail = ({ customer, onClose, refetch, setEditingJob }) => {
@@ -26,10 +39,8 @@ const CustomerDetail = ({ customer, onClose, refetch, setEditingJob }) => {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (customer.id) {
-      setDetails(customer);
-    }
-  }, [customer]);
+    if (customer.name) setDetails(customer);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -40,11 +51,7 @@ const CustomerDetail = ({ customer, onClose, refetch, setEditingJob }) => {
   };
 
   const handleSave = async () => {
-    // Adjust based on the actual structure. If `totalPrice` is a number, ensure conversion.
-    const { totalPrice, ...customerDetailsToSave } = details;
-    customerDetailsToSave.totalPrice = Number(totalPrice) || 0;
-
-    await saveCustomer(customerDetailsToSave);
+    await saveCustomer(details);
     refetch();
     onClose();
   };
@@ -73,31 +80,31 @@ const CustomerDetail = ({ customer, onClose, refetch, setEditingJob }) => {
         width: "100%",
         height: "100%",
         display: "flex",
-        alignItems: "flex-start",
+        alignItems: "flex-start", // Aligns the form to the top, especially important on small screens
         justifyContent: "center",
         backgroundColor: "rgba(0, 0, 0, 0.9)",
-        paddingTop: "10vh",
+        paddingTop: "10vh", // Adds some space at the top
         zIndex: theme.zIndex.modal,
-        overflowY: "auto",
+        overflowY: "auto", // Allows scrolling on small screens
       }}
     >
       <div
         style={{
-          marginTop: "20px",
+          marginTop: "20px", // Additional top margin if needed
           padding: theme.spacing(2),
           backgroundColor: theme.palette.background.default,
           boxShadow: theme.shadows[5],
           display: "flex",
           flexDirection: "column",
-          width: "90%",
-          maxWidth: "500px",
-          maxHeight: "80vh",
-          overflowY: "auto",
+          width: "90%", // Set width to 90% of the viewport
+          maxWidth: "500px", // Maximum width for larger screens
+          maxHeight: "80vh", // Max height to ensure it fits in the viewport
+          overflowY: "auto", // Scroll inside the form if content is too tall
           color: theme.palette.text.primary,
           border: `4px solid ${theme.palette.primary.main}`,
           borderRadius: theme.shape.borderRadius,
           textAlign: "center",
-          gap: theme.spacing(1),
+          gap: theme.spacing(1), // Reduced gap to save space
           zIndex: theme.zIndex.modal + 1,
         }}
       >
@@ -133,14 +140,22 @@ const CustomerDetail = ({ customer, onClose, refetch, setEditingJob }) => {
           variant="outlined"
           fullWidth
         />
-        {/* <TextField
-          label="Total Price"
-          name="totalPrice"
-          value={details.totalPrice}
-          onChange={handleChange}
-          variant="outlined"
-          fullWidth
-        /> */}
+        <span>Jobs</span>
+        {details?.jobs &&
+          details?.jobs.map((job, index) => {
+            return (
+              <Button
+                key={job + index}
+                variant="contained"
+                color="primary"
+                onClick={() => setEditingJob(job)}
+              >
+                {`${job.name}: ${job.jobDate.split("T")[0]} (${
+                  statusOptions[job.status]
+                })`}
+              </Button>
+            );
+          })}
         <div
           style={{
             display: "flex",
@@ -151,6 +166,7 @@ const CustomerDetail = ({ customer, onClose, refetch, setEditingJob }) => {
           <Button variant="contained" color="primary" onClick={handleSave}>
             Save
           </Button>
+
           {details.archived ? (
             <Button
               variant="contained"
@@ -174,6 +190,7 @@ const CustomerDetail = ({ customer, onClose, refetch, setEditingJob }) => {
               Archive
             </Button>
           )}
+
           <Button variant="outlined" onClick={onClose}>
             Close
           </Button>

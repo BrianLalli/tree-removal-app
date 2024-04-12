@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useTheme } from "@mui/material/styles";
 import { Calendar, momentLocalizer } from "react-big-calendar";
-import moment from "moment";
+import moment from "moment-timezone";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "../assets/styles/Calendar.css";
 import { getJobs, updateJobStatus } from "../api/jobs";
-import { getCustomers } from "../api/customers"; // Make sure this import is correct
+import { getCustomers } from "../api/customers";
 import JobDetail from "../components/JobDetail";
-import CustomerDetail from "../components/CustomerDetail"; // Ensure this is the correct path to your component
+import CustomerDetail from "../components/CustomerDetail";
 import { useSwipeable } from "react-swipeable";
 
+moment.tz.setDefault("America/New_York");
 const localizer = momentLocalizer(moment);
 
 const eventStyleGetter = (event, start, end, isSelected) => {
@@ -17,50 +18,44 @@ const eventStyleGetter = (event, start, end, isSelected) => {
   if (event.resource.status === "group-3") {
     backgroundColor = "#5cb85c";
   }
-
-  const style = {
-    backgroundColor,
-    borderRadius: "6px",
-    opacity: 0.8,
-    color: "black",
-    border: "0px",
-    display: "block",
+  return {
+    style: {
+      backgroundColor,
+      borderRadius: "6px",
+      opacity: 0.8,
+      color: "black",
+      border: "0px",
+      display: "block",
+    }
   };
-
-  return { style };
 };
 
 const MyCalendar = () => {
   const theme = useTheme();
   const [jobs, setJobs] = useState([]);
-  const [customers, setCustomers] = useState([]); // State for customers
+  const [customers, setCustomers] = useState([]);
   const [selectedJob, setSelectedJob] = useState(null);
   const [editingCustomer, setEditingCustomer] = useState(null);
 
   useEffect(() => {
     fetchJobs();
-    fetchCustomers(); // Fetch customers when the component mounts
+    fetchCustomers();
   }, []);
 
   const fetchJobs = async () => {
     const fetchedJobs = await getJobs();
-    const filteredJobs = fetchedJobs.filter((job) => job.status === "group-3");
-    const calendarEvents = filteredJobs.map((job) => ({
+    const filteredJobs = fetchedJobs.filter(job => job.status === "group-3");
+    const calendarEvents = filteredJobs.map(job => ({
       id: job.id,
       title: job.name,
-      start: moment.utc(job.jobDate).local().toDate(),
-      end: moment
-        .utc(job.jobDate)
-        .add(job.durationInHours, "hours")
-        .local()
-        .toDate(),
+      start: moment.tz(job.jobDate, "UTC").tz("America/New_York").toDate(),
+      end: moment.tz(job.jobDate, "UTC").add(job.durationInHours, "hours").tz("America/New_York").toDate(),
       allDay: false,
       resource: job,
     }));
     setJobs(calendarEvents);
   };
 
-  // Fetch customers function
   const fetchCustomers = async () => {
     const fetchedCustomers = await getCustomers();
     setCustomers(fetchedCustomers);
@@ -68,21 +63,22 @@ const MyCalendar = () => {
 
   const handleSelectEvent = (event) => {
     setSelectedJob(event.resource);
+    // New: Trigger CustomerDetail with the customer of the selected job
+    setEditingCustomer(event.resource.customer); // Assuming 'customer' is part of 'event.resource'
   };
 
   const handleEventChange = async ({ event, start, end }) => {
     const updatedJob = {
       ...event.resource,
-      jobDate: moment(start).utc().format(),
-      durationInHours: moment.utc(end).diff(moment.utc(start), "hours"),
+      jobDate: moment(start).tz("America/New_York").utc().format(),
+      durationInHours: moment(end).tz("America/New_York").diff(moment(start).tz("America/New_York"), "hours"),
     };
-
     await updateJobStatus(updatedJob);
     fetchJobs();
   };
 
   const handleJobDeletion = (jobId) => {
-    setJobs((prevJobs) => prevJobs.filter((job) => job.id !== jobId));
+    setJobs(prevJobs => prevJobs.filter(job => job.id !== jobId));
   };
 
   const handleJobMove = async (jobId, newStatus) => {
@@ -133,9 +129,9 @@ const MyCalendar = () => {
           onClose={() => setSelectedJob(null)}
           refetch={fetchJobs}
           onMove={handleJobMove}
-          setEditingCustomer={handleEditingCustomer} // Now JobDetail can trigger CustomerDetail
+          setEditingCustomer={handleEditingCustomer}
           onDelete={handleJobDeletion}
-          customers={customers} // Passing the customers to JobDetail
+          customers={customers}
         />
       )}
       {editingCustomer && (
