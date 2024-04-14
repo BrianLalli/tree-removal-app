@@ -50,10 +50,11 @@ const Header = () => {
       <AppBar
         position="fixed"
         sx={{
-          boxShadow: 0,
-          bgcolor: "transparent",
-          backgroundImage: "none",
-          mt: 2,
+          boxShadow: 'none',
+          bgcolor: 'transparent',
+          backgroundImage: 'none',
+          zIndex: theme => theme.zIndex.drawer + 1, // Ensure AppBar is above other content
+          padding: '10px 0', // More vertical padding to elevate design
         }}
       >
         <Container maxWidth="lg">
@@ -61,7 +62,6 @@ const Header = () => {
             disableGutters
             sx={{ display: "flex", justifyContent: "space-between" }}
           >
-            {/* Logo aligned to the left */}
             <Box
               sx={{
                 display: "flex",
@@ -80,9 +80,7 @@ const Header = () => {
                   }}
                 />
               </Link>
-              {/* The rest of your items (if any) would go here */}
             </Box>
-            {/* Logout and Calendar Buttons aligned to the right */}
             <Box
               sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}
             >
@@ -99,13 +97,13 @@ const Header = () => {
                 Logout
               </Button>
             </Box>
-            {/* Mobile Menu Icon Here */}
-            <Box sx={{ display: { xs: "block", md: "none" } }}>
-              <Button onClick={toggleDrawer(true)} color="primary">
-                <MenuIcon />
-              </Button>
-            </Box>
-            {/* Mobile Drawer Here */}
+            { !drawerOpen && // This line ensures the button is hidden when the drawer is open
+              <Box sx={{ display: { xs: "block", md: "none" } }}>
+                <Button onClick={toggleDrawer(true)} color="primary">
+                  <MenuIcon />
+                </Button>
+              </Box>
+            }
             <Drawer
               anchor="right"
               open={drawerOpen}
