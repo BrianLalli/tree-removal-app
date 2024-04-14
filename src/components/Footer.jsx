@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Container, Typography, IconButton, Grid } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import TwitterIcon from '@mui/icons-material/Twitter';
@@ -14,14 +14,30 @@ const FooterBox = styled(Box)(({ theme }) => ({
   color: theme.palette.getContrastText(theme.palette.grey[900]),
   padding: theme.spacing(1, 0),
   borderTop: `1px solid ${theme.palette.divider}`,
+  display: 'none', // Initially hide footer
   [theme.breakpoints.down('sm')]: {
-    padding: theme.spacing(1, 2), // Increase side padding on smaller screens for better readability
+    padding: theme.spacing(1, 2), // Increase side padding on smaller screens
   },
 }));
 
 const Footer = () => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const toggleVisibility = () => {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+        setIsVisible(true);
+      } else {
+        setIsVisible(false);
+      }
+    };
+
+    window.addEventListener('scroll', toggleVisibility);
+    return () => window.removeEventListener('scroll', toggleVisibility);
+  }, []);
+
   return (
-    <FooterBox>
+    <FooterBox style={{ display: isVisible ? 'block' : 'none' }}>
       <Container maxWidth="lg">
         <Grid container alignItems="center" justifyContent="space-between" spacing={1}>
           <Grid item xs={12} sm={6} textAlign={{ xs: 'center', sm: 'left' }}>
