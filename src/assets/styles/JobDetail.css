@@ -1,0 +1,22 @@
+/* JobDetail.css */
+
+/* Styles for buttons */
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px; /* adjust as needed */
+  }
+  
+  /* Mobile styles */
+  @media (max-width: 600px) {
+    .button-container {
+      flex-direction: column;
+      gap: 8px; /* smaller gap for mobile */
+    }
+  
+    .button-container button {
+      width: 100%; /* make buttons full width */
+      box-sizing: border-box; /* include padding and border in the width */
+    }
+  }
+  
