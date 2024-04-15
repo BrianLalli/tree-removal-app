@@ -1,17 +1,90 @@
-/* Add this at the bottom of your CSS file */
-@media (max-width: 600px) {
-    .rbc-calendar {
-      font-size: 14px;
+.calendar-container {
+    height: calc(100vh - var(--header-height) - var(--footer-height));
+    padding: 8px; /* Reduced padding on smaller screens */
+    background-color: #f0f2f5;
+    border-radius: 8px;
+    overflow-x: auto; /* Allow horizontal scrolling if necessary */
+    box-sizing: border-box;
+  }
+  
+  .react-big-calendar {
+    height: 100%;
+    width: auto; /* Let the calendar take up necessary width */
+  }
+  
+  /* Smaller text for the calendar on mobile */
+  .rbc-header,
+  .rbc-label,
+  .rbc-row-content .rbc-event-content,
+  .rbc-show-more {
+    font-size: 12px;
+  }
+  
+  .rbc-event {
+    background-color: #3174ad;
+    border-radius: 6px;
+    opacity: 0.8;
+    color: black;
+  }
+  
+  /* Handle event styles dynamically based on status */
+  .group-3-event {
+    background-color: #5cb85c;
+  }
+  
+  /* Adjusting toolbar and button sizes for smaller screens */
+@media (max-width: 768px) {
+    .rbc-toolbar {
+      margin: 8px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-    .rbc-event {
-      padding: 8px;
+  
+    .rbc-toolbar label {
       font-size: 12px;
-      border-radius: 4px; /* Make it a bit more touch-friendly */
+      padding: 4px 6px;
     }
-    .rbc-event-content {
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis; /* Ensure text doesn't overflow */
+  
+    .rbc-btn-group {
+      margin-bottom: 8px;
+    }
+  
+    .rbc-btn {
+      font-size: 12px;
+      padding: 6px 10px;
+    }
+  
+    .rbc-toolbar .rbc-btn-group button,
+    .rbc-toolbar button {
+      padding: 4px 6px; /* Smaller padding for buttons */
+      margin: 0 2px; /* Reduce margin between buttons */
+      font-size: 14px; /* Smaller font size */
+      min-width: 0; /* Allow buttons to shrink */
+    }
+  
+    .rbc-agenda-view table {
+      /* Adjust the font size and padding for agenda view */
+      font-size: 12px;
+    }
+  
+    .rbc-agenda-time-cell,
+    .rbc-agenda-event-cell {
+      padding: 4px 6px; /* Smaller padding for agenda cells */
     }
   }
+  
+  /* Ensuring the calendar takes the full width of the screen */
+  .calendar-container {
+    width: 100%;
+    min-width: initial; /* Reset any previously set min-width */
+  }
+  
+  /* Increase the min-width if needed to ensure content fits */
+  @media (min-width: 320px) {
+    .calendar-container {
+      min-width: 320px; /* This ensures that the calendar is at least 320px wide */
+    }
+  }
+  
   

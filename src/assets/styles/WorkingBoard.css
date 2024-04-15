@@ -1,42 +1,73 @@
 .working-board {
-    display: flex;
-    justify-content: space-around;
-    padding: 16px;
-  }
-  
+  display: flex;
+  justify-content: center; /* Center the content horizontally */
+  padding: 16px;
+  flex-wrap: wrap;
+}
+
+.customer-group {
+  background-color: #f4f4f4;
+  padding: 16px;
+  border-radius: 8px;
+  width: auto; /* Allow the width to adapt to the content and screen size */
+  max-width: 200px; /* Maximum width */
+  margin: 8px; /* Reduced margin for mobile devices */
+  box-sizing: border-box; /* Include padding and border in the width */
+}
+
+.customer-group.dragging-over {
+  background-color: #e0e0e0;
+}
+
+.customer-card {
+  background-color: #fff;
+  padding: 8px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  box-shadow: 0 2px 1px rgba(0,0,0,0.05);
+  cursor: grab;
+}
+
+.customer-card.dragging {
+  background-color: #ddd;
+  cursor: grabbing;
+}
+
+.new-customer-button {
+  margin-top: 8px;
+  background-color: #24a0ed;
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Media Queries for mobile responsiveness */
+@media (max-width: 768px) {
   .customer-group {
-    background-color: #f4f4f4;
-    padding: 16px;
-    border-radius: 8px;
-    width: 200px; /* Adjust the width as necessary */
-    margin-right: 16px;
+      margin: 8px auto; /* Centrally align and give automatic margins */
+      width: 90%; /* Take up 90% of the screen width */
   }
-  
-  .customer-group.dragging-over {
-    background-color: #e0e0e0;
+  .new-customer-button,
+  .new-job-button,
+  .search-bar {
+      width: 90%; /* Adjust width for mobile */
+      margin: 8px auto; /* Center align the buttons and search bar */
   }
-  
-  .customer-card {
-    background-color: #fff;
-    padding: 8px;
-    margin: 0 0 8px 0;
-    border-radius: 4px;
-    box-shadow: 0 2px 1px rgba(0,0,0,0.05);
-    cursor: grab;
+}
+
+@media (max-width: 375px) {
+  .working-board {
+      flex-direction: column;
+      padding: 8px; /* Reduce padding on smaller screens */
   }
-  
-  .customer-card.dragging {
-    background-color: #ddd;
-    cursor: grabbing;
-  }
-  
+  .customer-card,
   .new-customer-button {
-    margin-top: 8px;
-    background-color: #24a0ed;
-    color: white;
-    border: none;
-    padding: 8px;
-    border-radius: 4px;
-    cursor: pointer;
+      padding: 12px; /* Larger padding for better touchability */
+      margin-bottom: 8px; /* Add space between elements */
   }
-  
+  .customer-card {
+      font-size: 16px; /* Increase font size for readability */
+  }
+}
