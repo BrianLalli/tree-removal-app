@@ -19,6 +19,9 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { archiveJob, restoreJob, saveJob } from "../api/jobs";
 import Typeahead from "./Typeahead";
 import dayjs from "dayjs";
+import { generatePDF, downloadPDF } from "../utils/pdfGenerator";
+import '../assets/styles/JobDetail.css';
+
 
 const statusOptions = {
   "group-1": "Opportunities",
@@ -107,9 +110,11 @@ const JobDetail = ({
   };
 
   const handleViewCustomer = () => {
-    const selectedCustomer = customers.find((customer) => customer.id === details.customerId);
+    const selectedCustomer = customers.find(
+      (customer) => customer.id === details.customerId
+    );
     setEditingCustomer(selectedCustomer);
-    onClose();  // Close JobDetail when moving to CustomerDetail
+    onClose(); // Close JobDetail when moving to CustomerDetail
   };
 
   const handleOpen = () => setOpen(true);
@@ -125,6 +130,29 @@ const JobDetail = ({
     await restoreJob({ id: job.id });
     refetch();
     handleClose();
+  };
+
+  const handleDownloadPDF = async () => {
+    // Formatting the jobDate using dayjs for better readability in the PDF
+    const formattedJobDate = dayjs(details.jobDate).format("YYYY-MM-DD");
+  
+    const formData = {
+      "Job Name": details.name,
+      "Customer ID": details.customerId.toString(), // Ensuring ID is a string, if necessary
+      "Job Date": formattedJobDate,
+      "Duration in Hours": details.durationInHours.toString(),
+      "Price": details.price,
+      "Status": statusOptions[details.status],
+      "Notes": details.notes,
+      // Add other fields as necessary
+    };
+  
+    try {
+      const pdfBlob = await generatePDF(formData);
+      downloadPDF(pdfBlob, 'JobDetails.pdf');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    }
   };
 
   return (
@@ -153,7 +181,7 @@ const JobDetail = ({
           display: "flex",
           flexDirection: "column",
           width: "90%", // Set width to 90% of the viewport
-          maxWidth: "500px", // Maximum width for larger screens
+          maxWidth: "600px", // Maximum width for larger screens
           maxHeight: "80vh", // Max height to ensure it fits in the viewport
           overflowY: "auto", // Scroll inside the form if content is too tall
           color: theme.palette.text.primary,
@@ -255,7 +283,7 @@ const JobDetail = ({
             ))}
           </Select>
         </FormControl>
-        <div
+        <div className="button-container"
           style={{
             display: "flex",
             justifyContent: "space-between",
@@ -296,7 +324,13 @@ const JobDetail = ({
               Archive
             </Button>
           )}
-
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={handleDownloadPDF}
+          >
+            Download PDF
+          </Button>
           <Button variant="outlined" onClick={onClose}>
             Close
           </Button>
