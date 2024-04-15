@@ -19,9 +19,8 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { archiveJob, restoreJob, saveJob } from "../api/jobs";
 import Typeahead from "./Typeahead";
 import dayjs from "dayjs";
-import { generatePDF, downloadPDF } from "../utils/pdfGenerator";
-import '../assets/styles/JobDetail.css';
-
+import { generatePDF, downloadPDF, shareFile } from "../utils/pdfGenerator";
+import "../assets/styles/JobDetail.css";
 
 const statusOptions = {
   "group-1": "Opportunities",
@@ -132,26 +131,26 @@ const JobDetail = ({
     handleClose();
   };
 
-  const handleDownloadPDF = async () => {
+  const handleSharePDF = async () => {
     // Formatting the jobDate using dayjs for better readability in the PDF
     const formattedJobDate = dayjs(details.jobDate).format("YYYY-MM-DD");
-  
+
     const formData = {
       "Job Name": details.name,
       "Customer ID": details.customerId.toString(), // Ensuring ID is a string, if necessary
       "Job Date": formattedJobDate,
       "Duration in Hours": details.durationInHours.toString(),
-      "Price": details.price,
-      "Status": statusOptions[details.status],
-      "Notes": details.notes,
+      Price: details.price,
+      Status: statusOptions[details.status],
+      Notes: details.notes,
       // Add other fields as necessary
     };
-  
+
     try {
       const pdfBlob = await generatePDF(formData);
-      downloadPDF(pdfBlob, 'JobDetails.pdf');
+      await shareFile(pdfBlob, "JobDetails.pdf"); // Use the shareFile function
     } catch (error) {
-      console.error('Error generating PDF:', error);
+      console.error("Error generating or sharing PDF:", error);
     }
   };
 
@@ -283,7 +282,8 @@ const JobDetail = ({
             ))}
           </Select>
         </FormControl>
-        <div className="button-container"
+        <div
+          className="button-container"
           style={{
             display: "flex",
             justifyContent: "space-between",
@@ -326,10 +326,10 @@ const JobDetail = ({
           )}
           <Button
             variant="contained"
-            color="secondary"
-            onClick={handleDownloadPDF}
+            color="primary"
+            onClick={handleSharePDF} // Attach the handleSharePDF function here
           >
-            Download PDF
+            Share Invoice
           </Button>
           <Button variant="outlined" onClick={onClose}>
             Close

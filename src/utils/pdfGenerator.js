@@ -1,4 +1,4 @@
-// Importing the necessary part of pdf-lib
+// Importing the necessary parts of pdf-lib
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 
 /**
@@ -11,8 +11,8 @@ export async function generatePDF(formData) {
   const page = pdfDoc.addPage();
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const { width, height } = page.getSize();
-  let yOffset = height - 50; // Start printing from top of the page.
-  
+  let yOffset = height - 50; // Start printing from the top of the page.
+
   // Adjust these values as needed for your layout
   const fontSize = 12;
   const lineMargin = 15;
@@ -65,4 +65,31 @@ export function downloadPDF(blob, filename) {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+}
+
+/**
+ * Attempts to share a file using the Web Share API.
+ * @param {Blob} blob - The file as a Blob object to share.
+ * @param {string} filename - The filename for the shared file.
+ */
+export async function shareFile(blob, filename) {
+  // Create a file from the Blob object
+  const file = new File([blob], filename, { type: blob.type });
+
+  // Check if the Web Share API is supported and if it can share files
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      // Attempt to share the file
+      await navigator.share({
+        files: [file],
+        title: 'Share PDF',
+        text: 'Check out this PDF!',
+      });
+      console.log('File was shared successfully');
+    } catch (error) {
+      console.error('Error sharing the file:', error);
+    }
+  } else {
+    console.log('Web Share API is not supported in this browser, or the file type cannot be shared.');
+  }
 }
