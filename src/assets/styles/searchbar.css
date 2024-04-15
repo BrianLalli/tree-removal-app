@@ -1,7 +1,7 @@
 .search-bar-container {
-  max-width: 600px;
-  margin: auto; /* Added more margin for spacing around the search bar */
-  background-color: transparent; /* Adjust the color based on your theme */
+  max-width: 100%; /* Allow full width on smaller screens */
+  margin: auto;
+  background-color: transparent;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
 }
@@ -10,7 +10,7 @@
   display: flex;
   gap: 8px;
   align-items: center;
-  padding: 12px; /* Added padding inside the search form */
+  padding: 12px;
 }
 
 .search-input-wrapper {
@@ -25,11 +25,11 @@
 }
 
 .search-icon {
-  color: #3ab649; /* Use color from your theme */
+  color: #3ab649;
 }
 
 .search-input {
-  flex-grow: 1;
+  width: 100%; /* Full width to use available space */
   padding: 12px 16px;
   border: 1px solid #e4e4e7;
   border-radius: 20px;
@@ -40,13 +40,13 @@
 }
 
 .search-input:focus {
-  border-color: #3ab649; /* Use color from your theme */
+  border-color: #3ab649;
   outline: none;
 }
 
 .search-button {
   padding: 12px 24px;
-  background-color: #0D0000; /* Use color from your theme */
+  background-color: #0D0000;
   border-color: #3FA646;
   border-width: 3px;
   color: #ffffff;
@@ -57,54 +57,51 @@
 }
 
 .search-button:hover {
-  background-color: #3FA646; /* Use a darker shade from your theme */
+  background-color: #3FA646;
 }
 
 @media (max-width: 640px) {
   .search-bar-container {
-    padding: 12px;
-    border-radius: 0; /* Make the search bar extend full width on mobile */
-    box-shadow: none; /* Remove box shadow for a flatter design on mobile */
+    padding: 0; /* Remove padding to fit container on small screens */
+    border-radius: 0;
+    box-shadow: none;
   }
 
   .search-form {
     flex-direction: column;
   }
 
-  .search-input-wrapper {
-    width: 100%; /* Ensure the input uses the full width available */
-  }
-
   .search-input {
     padding: 10px 12px;
-    margin: 0;
-    border-radius: 10px; /* Smaller border-radius for a subtler look on mobile */
+    margin-bottom: 8px; /* Add space below input when stacked on mobile */
+    border-radius: 10px;
   }
 
   .search-button {
-    width: 100%; /* Full width button on mobile for easier access */
-    margin-top: 8px; /* Add margin above the button for spacing */
-    border-radius: 10px; /* Match the input border-radius */
+    width: 100%; /* Full width for easier access */
+    padding: 12px; /* Consistent padding for the button */
+    border-radius: 10px;
   }
 
   .search-icon-wrapper {
-    padding: 8px; /* Slightly less padding to save space */
+    padding: 8px;
   }
 }
 
 .search-results-dropdown {
   position: absolute;
-  top: 100%; /* Directly below the search bar */
+  top: 100%;
   left: 0;
   right: 0;
-  z-index: 1000; /* Above other content */
+  z-index: 1000;
   background-color: white;
   border: 1px solid #ddd;
-  border-top: none; /* Seamless connection with the search bar */
+  border-top: none;
   border-radius: 0 0 4px 4px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   max-height: 300px;
   overflow-y: auto;
+  width: 100%; /* Full width dropdown */
 }
 
 .search-result-item {
@@ -131,11 +128,4 @@
 .search-results-text {
   display: flex;
   align-items: center;
-}
-
-/* Add responsive design for the dropdown */
-@media (max-width: 640px) {
-  .search-results-dropdown {
-    width: calc(100% - 20px); /* Consider padding/margin if any */
-  }
 }

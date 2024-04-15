@@ -174,7 +174,8 @@ const JobDetail = ({
       <div
         style={{
           marginTop: "20px", // Additional top margin if needed
-          padding: theme.spacing(2),
+          paddingBottom: theme.spacing(2),
+          padding: theme.spacing(4),
           backgroundColor: theme.palette.background.default,
           boxShadow: theme.shadows[5],
           display: "flex",

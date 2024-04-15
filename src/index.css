@@ -17,23 +17,23 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: #3ab649;
   text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
+  color: #3FA646;
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
+  display: block; /* changed from flex to block for better control on mobile */
   min-height: 100vh;
+  width: 100%; /* ensure body does not cause horizontal scrolling */
+  overflow-x: hidden; /* prevent horizontal scrolling */
 }
 
 h1 {
-  font-size: 3.2em;
+  font-size: 3.2em; /* consider using 'vw' units or scaling down for mobile */
   line-height: 1.1;
 }
 
@@ -49,7 +49,7 @@ button {
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: #3ab649;
 }
 button:focus,
 button:focus-visible {
@@ -66,5 +66,27 @@ button:focus-visible {
   }
   button {
     background-color: #f9f9f9;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2.5em; /* scaled down for tablets and smaller devices */
+  }
+  button {
+    padding: 0.8em 1.4em; /* larger padding for easier interaction */
+  }
+}
+
+@media (max-width: 375px) {
+  h1 {
+    font-size: 2em; /* scaled down for mobile devices */
+  }
+  button {
+    padding: 0.9em 1.6em; /* even larger padding for touch targets */
+  }
+  a {
+    font-size: 0.9em; /* adjust links for smaller screens */
   }
 }
