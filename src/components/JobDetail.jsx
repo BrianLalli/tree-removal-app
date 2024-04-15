@@ -166,7 +166,7 @@ const JobDetail = ({
         alignItems: "flex-start", // Aligns the form to the top, especially important on small screens
         justifyContent: "center",
         backgroundColor: "rgba(0, 0, 0, 0.9)",
-        paddingTop: "5vh", // Adds some space at the top
+        paddingTop: "3vh", // Adds some space at the top
         zIndex: theme.zIndex.modal,
         overflowY: "auto", // Allows scrolling on small screens
       }}
@@ -288,7 +288,7 @@ const JobDetail = ({
           style={{
             display: "flex",
             justifyContent: "space-between",
-            marginTop: theme.spacing(3),
+            marginTop: theme.spacing(1),
           }}
         >
           <Button variant="contained" color="primary" onClick={handleSave}>
