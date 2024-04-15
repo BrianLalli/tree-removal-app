@@ -1,16 +1,5 @@
-// Importing the necessary parts of pdf-lib and fs module
+// Importing the necessary parts of pdf-lib
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
-import fs from 'fs/promises';
-
-// Function to read the logo as an ArrayBuffer
-async function getLogoArrayBuffer() {
-  // The path to the logo image
-  const logoPath = '../assets/images/TGTR.png';
-  // Read the logo file
-  const logoData = await fs.readFile(logoPath);
-  // Convert the Buffer to ArrayBuffer
-  return logoData.buffer.slice(logoData.byteOffset, logoData.byteOffset + logoData.byteLength);
-}
 
 /**
  * Generates a PDF from given form data and returns the PDF document as a Blob.
@@ -18,31 +7,19 @@ async function getLogoArrayBuffer() {
  * @returns {Promise<Blob>} - A promise that resolves with the Blob of the generated PDF.
  */
 export async function generatePDF(formData) {
-  // Load the logo as an ArrayBuffer
-  const logoArrayBuffer = await getLogoArrayBuffer();
-  
   const pdfDoc = await PDFDocument.create();
   const page = pdfDoc.addPage();
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-  // Embed the logo image
-  const logoImage = await pdfDoc.embedPng(logoArrayBuffer);
-  
-  // Draw the logo at the top of the page
-  const logoDims = logoImage.scale(0.25); // Scale the logo to an appropriate size
-  page.drawImage(logoImage, {
-    x: 50,
-    y: page.getHeight() - logoDims.height - 50,
-    width: logoDims.width,
-    height: logoDims.height,
-  });
+  const { width, height } = page.getSize();
+  let yOffset = height - 50; // Start printing from the top of the page.
 
-  let yOffset = page.getHeight() - logoDims.height - 100; // Start below the logo
+  // Adjust these values as needed for your layout
   const fontSize = 12;
-  const lineMargin = 18;
+  const lineMargin = 15;
 
   // Drawing form data as text in the PDF
   for (const key in formData) {
-    if (Object.prototype.hasOwnProperty.call(formData, key)) {
+    if (formData.hasOwnProperty(key)) {
       page.drawText(`${key}: ${formData[key]}`, {
         x: 50,
         y: yOffset,
@@ -54,16 +31,16 @@ export async function generatePDF(formData) {
     }
   }
 
-  // Add a line for the signature if necessary
+  // Add a line for the signature
   page.drawLine({
-    start: { x: 50, y: yOffset - 10 },
-    end: { x: 250, y: yOffset - 10 },
+    start: { x: 50, y: yOffset - 20 },
+    end: { x: 300, y: yOffset - 20 },
     color: rgb(0.0, 0.0, 0.0),
-    thickness: 1,
+    thickness: 1.5,
   });
   page.drawText("Signature:", {
     x: 50,
-    y: yOffset - 30,
+    y: yOffset - 40,
     size: fontSize,
     font: font,
     color: rgb(0, 0, 0),
@@ -71,8 +48,7 @@ export async function generatePDF(formData) {
 
   // Serialize the PDFDocument to bytes (a Uint8Array)
   const pdfBytes = await pdfDoc.save();
-  // Return the PDF as a Blob
-  return new Blob([pdfBytes], { type: 'application/pdf' });
+  return new Blob([pdfBytes], { type: "application/pdf" });
 }
 
 /**
