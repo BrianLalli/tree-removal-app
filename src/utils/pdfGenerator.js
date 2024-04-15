@@ -1,5 +1,11 @@
-// Importing the necessary parts of pdf-lib
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+
+// Assuming you have a utility to fetch array buffer of the image
+async function fetchLogoImage() {
+  const response = await fetch('../assets/images/TGTR.png'); // Adjust the path to where your logo is stored
+  const arrayBuffer = await response.arrayBuffer();
+  return arrayBuffer;
+}
 
 /**
  * Generates a PDF from given form data and returns the PDF document as a Blob.
@@ -11,13 +17,25 @@ export async function generatePDF(formData) {
   const page = pdfDoc.addPage();
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const { width, height } = page.getSize();
-  let yOffset = height - 50; // Start printing from the top of the page.
 
-  // Adjust these values as needed for your layout
-  const fontSize = 12;
-  const lineMargin = 15;
+  // Embed the company logo
+  const logoImageBytes = await fetchLogoImage();
+  const logoImage = await pdfDoc.embedPng(logoImageBytes);
+  const logoWidth = 100;
+  const logoHeight = logoImage.height / logoImage.width * logoWidth;
+  page.drawImage(logoImage, {
+    x: 50,
+    y: height - 50 - logoHeight,
+    width: logoWidth,
+    height: logoHeight
+  });
+
+  // Initialize yOffset after logo
+  let yOffset = height - 60 - logoHeight; // Start below the logo
 
   // Drawing form data as text in the PDF
+  const fontSize = 12;
+  const lineMargin = 15;
   for (const key in formData) {
     if (formData.hasOwnProperty(key)) {
       page.drawText(`${key}: ${formData[key]}`, {
@@ -35,7 +53,7 @@ export async function generatePDF(formData) {
   page.drawLine({
     start: { x: 50, y: yOffset - 20 },
     end: { x: 300, y: yOffset - 20 },
-    color: rgb(0.0, 0.0, 0.0),
+    color: rgb(0, 0, 0),
     thickness: 1.5,
   });
   page.drawText("Signature:", {
@@ -49,47 +67,4 @@ export async function generatePDF(formData) {
   // Serialize the PDFDocument to bytes (a Uint8Array)
   const pdfBytes = await pdfDoc.save();
   return new Blob([pdfBytes], { type: "application/pdf" });
-}
-
-/**
- * Triggers a download of the given Blob.
- * @param {Blob} blob - The Blob to download (e.g., our generated PDF).
- * @param {string} filename - The filename to save as.
- */
-export function downloadPDF(blob, filename) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename || "download.pdf";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-/**
- * Attempts to share a file using the Web Share API.
- * @param {Blob} blob - The file as a Blob object to share.
- * @param {string} filename - The filename for the shared file.
- */
-export async function shareFile(blob, filename) {
-  // Create a file from the Blob object
-  const file = new File([blob], filename, { type: blob.type });
-
-  // Check if the Web Share API is supported and if it can share files
-  if (navigator.canShare && navigator.canShare({ files: [file] })) {
-    try {
-      // Attempt to share the file
-      await navigator.share({
-        files: [file],
-        title: 'Share PDF',
-        text: 'Check out this PDF!',
-      });
-      console.log('File was shared successfully');
-    } catch (error) {
-      console.error('Error sharing the file:', error);
-    }
-  } else {
-    console.log('Web Share API is not supported in this browser, or the file type cannot be shared.');
-  }
 }
