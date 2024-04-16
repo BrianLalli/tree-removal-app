@@ -156,14 +156,18 @@ const WorkingBoard = () => {
     }
   };
 
-  const handleCloseDetail = () => {
-    setEditingCustomer(null);
+  const handleCloseJobDetail = () => {
     setEditingJob(null);
+  };
+
+  const handleCloseCustomerDetail = () => {
+    setEditingCustomer(null);
   };
 
   const refetch = () => {
     setRefetchData(true);
-    handleCloseDetail();
+    handleCloseJobDetail();
+    handleCloseCustomerDetail();
   };
 
   const handleMoveJob = (customerId, newGroupId) => {
@@ -338,7 +342,7 @@ const WorkingBoard = () => {
           <CustomerDetail
             customer={editingCustomer}
             setEditingJob={setEditingJob}
-            onClose={handleCloseDetail}
+            onClose={handleCloseCustomerDetail}
             refetch={refetch}
             onDelete={handleDeleteCustomer}
           />
@@ -348,7 +352,7 @@ const WorkingBoard = () => {
             job={editingJob}
             customers={customers}
             setEditingCustomer={setEditingCustomer}
-            onClose={handleCloseDetail}
+            onClose={handleCloseJobDetail}
             refetch={refetch}
             onMove={handleMoveJob}
             onDelete={handleDeleteJob}
