@@ -13,6 +13,7 @@
   -moz-osx-font-smoothing: grayscale;
   --header-height: 66px;
   --footer-height: 50px;
+  width: 100vw;
 }
 
 a {
