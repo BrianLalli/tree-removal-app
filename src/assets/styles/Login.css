@@ -1,0 +1,22 @@
+/* Login.css */
+.auth-container {
+    padding: 20px;  /* Provides padding inside the container */
+    max-width: 360px;  /* Sets a maximum width for the component on larger screens */
+    margin: 0 auto;  /* Centers the component horizontally */
+    width: 100%;  /* Ensures it takes the full width on smaller devices */
+  }
+  
+  @media (max-width: 600px) {
+    .auth-container {
+      padding: 10px;  /* Smaller padding for smaller screens */
+      font-size: 14px;  /* Adjust font size for smaller screens */
+    }
+  }
+  
+  @media (min-width: 601px) {
+    .auth-container {
+      padding: 30px;  /* Larger padding for larger screens */
+      font-size: 16px;  /* Larger font size for readability on larger screens */
+    }
+  }
+  
