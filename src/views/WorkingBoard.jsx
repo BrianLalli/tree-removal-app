@@ -43,6 +43,7 @@ const WorkingBoard = () => {
   const [editingJob, setEditingJob] = useState(null);
   const [customers, setCustomers] = useState([]);
   const [refetchData, setRefetchData] = useState(false);
+  const [viewAllStatus, setViewAllStatus] = useState({});
 
   useEffect(() => {
     async function fetchCustomersAndJobsOnMount() {
@@ -223,7 +224,10 @@ const WorkingBoard = () => {
   };
 
   const toggleViewAll = (groupId) => {
-    setGroupViewAll((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
+    setViewAllStatus((prevStatus) => ({
+      ...prevStatus,
+      [groupId]: !prevStatus[groupId], // Toggle the boolean value
+    }));
   };
 
   return (
@@ -304,8 +308,36 @@ const WorkingBoard = () => {
                   <Typography variant="h6" sx={{ wordBreak: "break-word" }}>
                     {`${group.name} (${group.items.length})`}
                   </Typography>
-                  {group.items &&
-                    group.items.map((job, index) => (
+                  <Button
+                    onClick={() => toggleViewAll(groupId)}
+                    variant="contained" // gives the button a more "3D" look
+                    color="white" // ensures the button aligns with the primary theme color
+                    sx={{
+                      width: "auto",
+                      minWidth: "100px", // ensures the button isn't too small
+                      maxWidth: "150px", // prevents the button from getting too large
+                      margin: theme.spacing(1),
+                      padding: theme.spacing(0.5, 1),
+                      fontSize: "0.875rem", // sets a comfortable font size
+                      textTransform: "none", // avoids uppercase text
+                      boxShadow: theme.shadows[2], // applies theme shadow for depth
+                      "&:hover": {
+                        boxShadow: theme.shadows[4], // darker shadow on hover for a "lift" effect
+                      },
+                      transition: theme.transitions.create(
+                        ["background-color", "box-shadow"],
+                        {
+                          duration: theme.transitions.duration.standard,
+                        }
+                      ),
+                    }}
+                  >
+                    {viewAllStatus[groupId] ? "View Less" : "View All"}
+                  </Button>
+
+                  {group.items
+                    .slice(0, viewAllStatus[groupId] ? group.items.length : 10)
+                    .map((job, index) => (
                       <Draggable
                         key={job.id}
                         draggableId={job.id.toString()}
