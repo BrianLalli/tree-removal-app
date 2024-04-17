@@ -61,7 +61,7 @@ const Header = () => {
             disableGutters
             sx={{ display: "flex", justifyContent: "space-between" }}
           >
-{/* Logo aligned to the left */}
+            {/* Logo aligned to the left */}
             <Box
               sx={{
                 display: "flex",
@@ -80,17 +80,30 @@ const Header = () => {
                   }}
                 />
               </Link>
-{/* The rest of your items (if any) would go here */}
+              {/* The rest of your items (if any) would go here */}
             </Box>
-{/* Logout and Calendar Buttons aligned to the right */}
+            {/* Logout and Calendar Buttons aligned to the right */}
             <Box
-              sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}
+              sx={{
+                display: { xs: "none", md: "flex" },
+                alignItems: "center",
+                justifyContent: "space-around", // This evenly spaces the children
+                padding: "0 10px",
+                gap: "10px",
+              }}
             >
-              <Link to="/calendar" style={{ textDecoration: "none", marginRight: "10px" }}>
+              <Link to="/calendar" style={{ textDecoration: "none" }}>
                 <Button color="primary" variant="contained">
                   Calendar
                 </Button>
               </Link>
+              {/* Ensure each Link and Button is a direct child of Box for consistent styling */}
+              <Link to="/working-board" style={{ textDecoration: "none" }}>
+                <Button color="primary" variant="contained">
+                  Dashboard
+                </Button>
+              </Link>
+              {/* Direct Button for Logout */}
               <Button
                 color="primary"
                 variant="contained"
@@ -99,12 +112,13 @@ const Header = () => {
                 Logout
               </Button>
             </Box>
+
             {/* Mobile Menu Icon Here */}
-              <Box sx={{ display: { xs: "block", md: "none" } }}>
-                <Button onClick={toggleDrawer(true)} color="primary">
-                  <MenuIcon />
-                </Button>
-              </Box>
+            <Box sx={{ display: { xs: "block", md: "none" } }}>
+              <Button onClick={toggleDrawer(true)} color="primary">
+                <MenuIcon />
+              </Button>
+            </Box>
             {/* Mobile Drawer Here */}
             <Drawer
               anchor="right"
@@ -119,6 +133,9 @@ const Header = () => {
               >
                 <Link to="/calendar" style={{ color: "black" }}>
                   <MenuItem>Calendar</MenuItem>
+                </Link>
+                <Link to="/working-board" style={{ color: "black" }}>
+                  <MenuItem>Dashboard</MenuItem>
                 </Link>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
               </Box>
