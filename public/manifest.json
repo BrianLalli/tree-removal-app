@@ -1,0 +1,50 @@
+{
+  "short_name": "Treely",
+  "name": "Treely - Tree Removal Made Easy",
+  "icons": [
+    {
+      "src": "tree-icon.png",
+      "type": "image/png",
+      "sizes": "72x72"
+    },
+    {
+      "src": "tree-icon.png",
+      "type": "image/png",
+      "sizes": "96x96"
+    },
+    {
+      "src": "tree-icon.png",
+      "type": "image/png",
+      "sizes": "128x128"
+    },
+    {
+      "src": "tree-icon.png",
+      "type": "image/png",
+      "sizes": "144x144"
+    },
+    {
+      "src": "tree-icon.png",
+      "type": "image/png",
+      "sizes": "152x152"
+    },
+    {
+      "src": "tree-icon.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "tree-icon.png",
+      "type": "image/png",
+      "sizes": "384x384"
+    },
+    {
+      "src": "tree-icon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#3ab649",
+  "background_color": "#F2F2F2"
+}
