@@ -69,3 +69,24 @@ export const getJobs = async () => {
     console.error("Failed to fetch jobs", e);
   }
 };
+
+export const getJobAndCustomerById = async (jobId) => {
+  try {
+    const { data: jobData } = await supabase
+      .from("jobs")
+      .select()
+      .eq("id", jobId);
+    console.log("Successfully fetched job!", jobData);
+
+    const customerId = jobData[0].customerId;
+    const { data: customerData } = await supabase
+      .from("customers")
+      .select()
+      .eq("id", customerId);
+    console.log("Successfully fetched customer!", customerData);
+
+    return { job: jobData[0], customer: customerData[0] };
+  } catch (e) {
+    console.error("Failed to fetch job and customer", e);
+  }
+};
