@@ -17,24 +17,28 @@ const WorkingBoard = () => {
       name: "Opportunities",
       color: "#FFD700",
       items: [],
+      totalRevenue: 0,
     },
     "group-2": {
       id: "group-2",
       name: "Pending",
       color: "#FF8C00",
       items: [],
+      totalRevenue: 0,
     },
     "group-3": {
       id: "group-3",
       name: "Upcoming Jobs",
       color: "#1E90FF",
       items: [],
+      totalRevenue: 0,
     },
     "group-4": {
       id: "group-4",
       name: "Completed Jobs",
       color: "#32CD32",
       items: [],
+      totalRevenue: 0,
     },
   };
   const [customerGroups, setCustomerGroups] = useState({});
@@ -50,9 +54,14 @@ const WorkingBoard = () => {
       let groups = _.cloneDeep(initialGroups);
       const customers = await getCustomers();
       const jobs = await getJobs();
-      jobs.map((job) => {
+      jobs.forEach((job) => {
         if (!job?.archived) {
-          groups[job.status]?.items?.push(job);
+          const jobPrice = parseFloat(job.price) || 0;
+          groups[job.status]?.items.push(job);
+          if (groups[job.status].totalRevenue === undefined) {
+            groups[job.status].totalRevenue = 0;
+          }
+          groups[job.status].totalRevenue += jobPrice;
         }
         const customer = customers.find(
           (customer) => customer.id === job.customerId
@@ -74,9 +83,14 @@ const WorkingBoard = () => {
         let groups = _.cloneDeep(initialGroups);
         const customers = await getCustomers();
         const jobs = await getJobs();
-        jobs.map((job) => {
+        jobs.forEach((job) => {
           if (!job?.archived) {
-            groups[job.status]?.items?.push(job);
+            const jobPrice = parseFloat(job.price) || 0;
+            groups[job.status]?.items.push(job);
+            if (groups[job.status].totalRevenue === undefined) {
+              groups[job.status].totalRevenue = 0;
+            }
+            groups[job.status].totalRevenue += jobPrice;
           }
           const customer = customers.find(
             (customer) => customer.id === job.customerId
@@ -131,6 +145,9 @@ const WorkingBoard = () => {
       };
       setCustomerGroups(newState);
     } else {
+      const job = customerGroups[source.droppableId].items[source.index];
+      const jobPrice = parseFloat(job.price) || 0; // Get the price of the job, defaulting to 0 if not set
+
       const [sourceClone, destClone] = move(
         customerGroups[source.droppableId].items,
         customerGroups[destination.droppableId].items,
@@ -143,14 +160,18 @@ const WorkingBoard = () => {
         [source.droppableId]: {
           ...customerGroups[source.droppableId],
           items: sourceClone,
+          totalRevenue:
+            customerGroups[source.droppableId].totalRevenue - jobPrice, // Subtract job price from source group
         },
         [destination.droppableId]: {
           ...customerGroups[destination.droppableId],
           items: destClone,
+          totalRevenue:
+            customerGroups[destination.droppableId].totalRevenue + jobPrice, // Add job price to destination group
         },
       };
       updateJobStatus({
-        id: result.draggableId,
+        id: job.id,
         status: destination.droppableId,
       });
       setCustomerGroups(newState);
@@ -303,38 +324,19 @@ const WorkingBoard = () => {
                     boxShadow: snapshot.isDraggingOver ? 3 : 1,
                     margin: theme.spacing(1),
                     color: theme.palette.text.primary,
+                    display: "flex",
+                    flexDirection: "column",
                   }}
                 >
-                  <Typography variant="h6" sx={{ wordBreak: "break-word" }}>
-                    {`${group.name} (${group.items.length})`}
+                  <Typography variant="h6" sx={{ wordBreak: "break-word", marginBottom: 1 }}>
+                    {group.name} ({group.items.length})
                   </Typography>
-                  <Button
-                    onClick={() => toggleViewAll(groupId)}
-                    variant="contained" // gives the button a more "3D" look
-                    color="white" // ensures the button aligns with the primary theme color
-                    sx={{
-                      width: "auto",
-                      minWidth: "100px", // ensures the button isn't too small
-                      maxWidth: "150px", // prevents the button from getting too large
-                      margin: theme.spacing(1),
-                      padding: theme.spacing(0.5, 1),
-                      fontSize: "0.875rem", // sets a comfortable font size
-                      textTransform: "none", // avoids uppercase text
-                      boxShadow: theme.shadows[2], // applies theme shadow for depth
-                      "&:hover": {
-                        boxShadow: theme.shadows[4], // darker shadow on hover for a "lift" effect
-                      },
-                      transition: theme.transitions.create(
-                        ["background-color", "box-shadow"],
-                        {
-                          duration: theme.transitions.duration.standard,
-                        }
-                      ),
-                    }}
+                  <Typography
+                    component="div"
+                    sx={{ fontSize: "0.875rem", fontWeight: "bold", color: "green", marginBottom: 2 }}
                   >
-                    {viewAllStatus[groupId] ? "View Less" : "View All"}
-                  </Button>
-
+                    Total Revenue: ${group.totalRevenue.toFixed(2)}
+                  </Typography>
                   {group.items
                     .slice(0, viewAllStatus[groupId] ? group.items.length : 10)
                     .map((job, index) => (
@@ -369,6 +371,17 @@ const WorkingBoard = () => {
                       </Draggable>
                     ))}
                   {provided.placeholder}
+                  <Button
+                    onClick={() => toggleViewAll(groupId)}
+                    variant="contained"
+                    color="white"
+                    sx={{
+                      mt: 2,
+                      alignSelf: 'center',
+                    }}
+                  >
+                    {viewAllStatus[groupId] ? "View Less" : "View All"}
+                  </Button>
                 </Box>
               )}
             </Droppable>
@@ -396,7 +409,7 @@ const WorkingBoard = () => {
         )}
       </DragDropContext>
     </Box>
-  );
+  );  
 };
 
 export default WorkingBoard;
