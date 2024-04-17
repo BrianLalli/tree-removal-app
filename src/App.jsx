@@ -8,6 +8,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "../src/layout";
 import WorkingBoard from "./views/WorkingBoard";
 import Calendar from "./views/Calendar"; // Make sure this path is correct
+import Invoice from "./views/Invoice";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
             path="/"
           />
           <Route element={<Login />} path="/login" />
+          <Route element={<Invoice />} path="/invoice/:invoiceId" />
           <Route
             element={
               <ProtectedRoute>
@@ -35,7 +37,6 @@ function App() {
             }
             path="/working-board"
           />
-          {/* Add this new Route for the Calendar view */}
           <Route
             element={
               <ProtectedRoute>

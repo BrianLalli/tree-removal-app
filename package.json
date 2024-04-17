@@ -12,6 +12,7 @@
   "dependencies": {
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.0",
+    "@hugocxl/react-to-image": "^0.0.9",
     "@material-ui/styles": "^4.11.5",
     "@mui/icons-material": "^5.15.14",
     "@mui/material": "^5.15.14",
@@ -23,6 +24,7 @@
     "date-fns": "^3.6.0",
     "dayjs": "^1.11.10",
     "framer-motion": "^11.0.20",
+    "html-to-image": "^1.11.11",
     "lodash": "^4.17.21",
     "pdf-lib": "^1.17.1",
     "react": "^18.2.0",

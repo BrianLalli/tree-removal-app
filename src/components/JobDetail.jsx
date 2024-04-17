@@ -21,6 +21,7 @@ import Typeahead from "./Typeahead";
 import dayjs from "dayjs";
 import { generatePDF, downloadPDF, shareFile } from "../utils/pdfGenerator";
 import "../assets/styles/JobDetail.css";
+import { useNavigate } from "react-router-dom";
 
 const statusOptions = {
   "group-1": "Opportunities",
@@ -53,6 +54,7 @@ const JobDetail = ({
   const theme = useTheme();
   const [details, setDetails] = useState(initialJobState);
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (job.id) {
@@ -108,10 +110,12 @@ const JobDetail = ({
     onClose();
   };
 
+  const getSelectedCustomer = (customerId) => {
+    return customers.find((customer) => customer.id === customerId);
+  }
+
   const handleViewCustomer = () => {
-    const selectedCustomer = customers.find(
-      (customer) => customer.id === details.customerId
-    );
+  const selectedCustomer = getSelectedCustomer(details.customerId);
     setEditingCustomer(selectedCustomer);
     onClose(); // Close JobDetail when moving to CustomerDetail
   };
@@ -131,28 +135,33 @@ const JobDetail = ({
     handleClose();
   };
 
-  const handleSharePDF = async () => {
-    // Formatting the jobDate using dayjs for better readability in the PDF
-    const formattedJobDate = dayjs(details.jobDate).format("YYYY-MM-DD");
+  const handleViewInvoice = () => {
+    navigate(`/invoice/${job.id}`, {state: {customer: getSelectedCustomer(details.customerId), job: details}});
+  }
 
-    const formData = {
-      "Job Name": details.name,
-      "Customer ID": details.customerId.toString(), // Ensuring ID is a string, if necessary
-      "Job Date": formattedJobDate,
-      "Duration in Hours": details.durationInHours.toString(),
-      Price: details.price,
-      Status: statusOptions[details.status],
-      Notes: details.notes,
-      // Add other fields as necessary
-    };
 
-    try {
-      const pdfBlob = await generatePDF(formData);
-      await shareFile(pdfBlob, "JobDetails.pdf"); // Use the shareFile function
-    } catch (error) {
-      console.error("Error generating or sharing PDF:", error);
-    }
-  };
+  // const handleSharePDF = async () => {
+  //   // Formatting the jobDate using dayjs for better readability in the PDF
+  //   const formattedJobDate = dayjs(details.jobDate).format("YYYY-MM-DD");
+
+  //   const formData = {
+  //     "Job Name": details.name,
+  //     "Customer ID": details.customerId.toString(), // Ensuring ID is a string, if necessary
+  //     "Job Date": formattedJobDate,
+  //     "Duration in Hours": details.durationInHours.toString(),
+  //     Price: details.price,
+  //     Status: statusOptions[details.status],
+  //     Notes: details.notes,
+  //     // Add other fields as necessary
+  //   };
+
+  //   try {
+  //     const pdfBlob = await generatePDF(formData);
+  //     await shareFile(pdfBlob, "JobDetails.pdf"); // Use the shareFile function
+  //   } catch (error) {
+  //     console.error("Error generating or sharing PDF:", error);
+  //   }
+  // };
 
   return (
     <div
@@ -328,9 +337,9 @@ const JobDetail = ({
           <Button
             variant="contained"
             color="primary"
-            onClick={handleSharePDF} // Attach the handleSharePDF function here
+            onClick={handleViewInvoice}
           >
-            Share Invoice
+            View Invoice
           </Button>
           <Button variant="outlined" onClick={onClose}>
             Close
