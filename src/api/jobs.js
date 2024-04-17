@@ -84,9 +84,20 @@ export const getJobAndCustomerById = async (jobId) => {
       .select()
       .eq("id", customerId);
     console.log("Successfully fetched customer!", customerData);
-
     return { job: jobData[0], customer: customerData[0] };
   } catch (e) {
     console.error("Failed to fetch job and customer", e);
+  }
+};
+
+export const setJobPaidStatus = async ({ id, isPaid }) => {
+  try {
+    const { data } = await supabase
+      .from("jobs")
+      .update({ isPaid })
+      .eq("id", id);
+    console.log("Successfully updated job paid status!", data);
+  } catch (e) {
+    console.error("Failed to update job paid status", e);
   }
 };

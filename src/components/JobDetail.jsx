@@ -12,11 +12,13 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { archiveJob, restoreJob, saveJob } from "../api/jobs";
+import { archiveJob, restoreJob, saveJob, setJobPaidStatus } from "../api/jobs";
 import Typeahead from "./Typeahead";
 import dayjs from "dayjs";
 import { generatePDF, downloadPDF, shareFile } from "../utils/pdfGenerator";
@@ -36,6 +38,7 @@ const initialJobState = {
   tasks: ["", "", ""],
   notes: "",
   jobDate: new Date(),
+  isPaid: false,
   durationInHours: 0,
   price: "",
   customerId: null,
@@ -112,10 +115,10 @@ const JobDetail = ({
 
   const getSelectedCustomer = (customerId) => {
     return customers.find((customer) => customer.id === customerId);
-  }
+  };
 
   const handleViewCustomer = () => {
-  const selectedCustomer = getSelectedCustomer(details.customerId);
+    const selectedCustomer = getSelectedCustomer(details.customerId);
     setEditingCustomer(selectedCustomer);
     onClose(); // Close JobDetail when moving to CustomerDetail
   };
@@ -136,9 +139,13 @@ const JobDetail = ({
   };
 
   const handleViewInvoice = () => {
-    navigate(`/invoice/${job.id}`, {state: {customer: getSelectedCustomer(details.customerId), job: details}});
-  }
-
+    navigate(`/invoice/${job.id}`, {
+      state: {
+        customer: getSelectedCustomer(details.customerId),
+        job: details,
+      },
+    });
+  };
 
   // const handleSharePDF = async () => {
   //   // Formatting the jobDate using dayjs for better readability in the PDF
@@ -258,6 +265,20 @@ const JobDetail = ({
           onChange={handleChange}
           variant="outlined"
           fullWidth
+        />
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={details.isPaid}
+              onChange={() => {
+                setDetails((prevDetails) => ({
+                  ...prevDetails,
+                  isPaid: !details.isPaid,
+                }));
+              }}
+            />
+          }
+          label="Invoice Paid"
         />
         <TextField
           label="Duration In Hours"
