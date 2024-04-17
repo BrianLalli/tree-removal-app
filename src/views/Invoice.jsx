@@ -81,7 +81,7 @@ const Invoice = () => {
         </>
       )}
       <div ref={ref} className="invoice">
-        <img src="/public/TGTR.png" alt="Image" className="image" />
+        <img src="/TGTR.png" alt="Image" className="image" />
         <div className="formContainer">
           <div className="formElementParent">
             <div>
