@@ -222,6 +222,10 @@ const WorkingBoard = () => {
     });
   };
 
+  const toggleViewAll = (groupId) => {
+    setGroupViewAll((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
+  };
+
   return (
     <Box
       sx={{
@@ -298,7 +302,7 @@ const WorkingBoard = () => {
                   }}
                 >
                   <Typography variant="h6" sx={{ wordBreak: "break-word" }}>
-                    {group.name}
+                    {`${group.name} (${group.items.length})`}
                   </Typography>
                   {group.items &&
                     group.items.map((job, index) => (
