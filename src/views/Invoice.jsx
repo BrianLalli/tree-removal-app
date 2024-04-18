@@ -84,32 +84,70 @@ const Invoice = () => {
         <img src="/TGTR.png" alt="Image" className="image" />
         <div className="formContainer">
           <div className="formElementParent">
+            {/* Tasks to be performed section */}
+            <div className="tasksList">
+              <h3>Tasks to be performed:</h3>
+              <ul>
+                {job.tasks.map((task, index) => (
+                  <li key={index}>{task}</li> // Assuming `task` is a string
+                ))}
+              </ul>
+            </div>
+            {/* Additional Notes section */}
+            {job.notes && (
+              <div className="invoice-section">
+                <h3>Additional Notes:</h3>
+                <p>{job.notes}</p>
+              </div>
+            )}
+            <h3>Customer Details:</h3>
             <div>
               Customer: <span>{customer.name}</span>
             </div>
             <div>
               Address: <span>{customer.address}</span>
             </div>
-            <div>
+            {/* <div>
               Job Name: <span>{job.name}</span>
-            </div>
+            </div> */}
             <div>
               Job Date: <span>{new Date(job.jobDate).toDateString()}</span>
             </div>
           </div>
           <div className="formElementParent">
-            <div>
+            {/* <div>
               Invoice Id: <span>{job.id}</span>
             </div>
             <div>
               Invoice Date: <span>{new Date().toDateString()}</span>
-            </div>
-            <div>
+            </div> */}
+            {/* <div>
               Invoice Status: <span>{job.isPaid ? "Paid" : "Not Paid"}</span>
-            </div>
+            </div> */}
           </div>
         </div>
-        <div className="invoiceAmount">Invoice Amount: ${job.price}</div>
+        <div className="invoiceAmount">Total Price: ${job.price}</div>
+        <div className="invoice-footer">
+          <div className="customer-signature">
+            <strong>Customer Name:</strong> <span>______________________</span>
+          </div>
+          <div className="customer-signature">
+            <strong>Customer Signature:</strong>{" "}
+            <span>______________________</span>
+          </div>
+          <div className="company-signature">
+            <strong>Company Rep Name:</strong>{" "}
+            <span>______________________</span>
+          </div>
+          <div className="company-signature">
+            <strong>Company Rep Signature:</strong>{" "}
+            <span>______________________</span>
+          </div>
+          <div className="email-insurance">
+            <div>Email: twoguystreeservice@outlook.com</div>
+            <div>Fully Insured</div>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -1,50 +1,112 @@
+/* Invoice general styles for a clean look */
+.invoice {
+  max-width: 500px;
+  margin: auto;
+  padding: 20px;
+  border: 4px solid white;
+  background-color: white;
+  color: black;
+  margin: 10px;
+  margin-bottom: 20px;
+  border: none;
+  border-radius: 4px; /* Rounded corners for buttons */
+  box-shadow: 0px 2px 4px rgba(0,0,0,0.2); /* Button shadow for depth */
+}
+
+/* Image and header styles */
+.image {
+  width: 50%;
+  height: auto;
+  margin: 0 auto; /* Center image */
+}
+
+/* Style adjustments for buttons */
 .downloadButton,
 .paidButton,
 .dashboardButton {
-  position: relative; /* Changed from absolute to relative */
-  display: block; /* This makes each button take the full width of the container */
-  margin-top: 10px; /* Adds a small space above the first button */
+  position: relative;
+  display: block;
+  margin-top: 10px;
   background-color: #4CAF50 !important;
   color: black !important;
   margin: 10px !important;
   margin-bottom: 20px !important;
 }
 
-.invoice {
-    max-width: 500px;
-    padding: 20px;
-    border: 4px solid white;
-    background-color: #3b3b3b;
-    text-align: center; /* Center aligns the buttons and image */
+/* Task list styling for clear, bulleted tasks */
+.tasksList {
+  text-align: center; /* Align tasks text to the left */
+  margin: 0 auto; /* Center the container */
+  max-width: 640px; /* Set a max-width or width that fits your design */
+  margin-bottom: 40px;
 }
 
-.image {
-  width: 90%;
-  height: 240px;
+.tasksList h3 {
+  text-align: center; /* Align the title "Tasks to be performed" to the center */
 }
 
-.formContainer {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-  text-align: left;
+.tasksList ul {
+  list-style: none;
+  padding-left: 0;
+  text-align: center; /* Center the bulleted list */
+  display: inline-block; /* Allows the bulleted list to respect text-align center */
 }
 
-.formElementParent {
-  margin: 5px;
+.tasksList ul li {
+  text-align: left; /* Align the text of list items to the left */
+  position: relative;
+  padding-left: 20px; /* Add padding to the left of list items for custom bullets */
 }
 
-.formElementParent > div {
-  font-size: 11px;
+.tasksList ul li::before {
+  content: '•'; /* Custom bullet point */
+  color: #4CAF50; /* Green color for bullet */
+  font-size: 20px; /* Larger bullet point */
+  position: absolute;
+  left: 0; /* Align bullets to the left edge */
+  top: 0;
+}
+
+/* Signature line styles */
+.signature-line {
+  border-top: 1px solid #000;
+  width: 200px;
+  display: block;
+  margin-top: 2px;
+}
+
+.customer-signature, .company-signature {
+  margin-top: 30px;
+}
+
+/* Signature names */
+.customer-name, .company-name {
   font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
 }
 
-.formElementParent > div > span {
-  font-weight: normal;
+/* Signature lines below names */
+.signature-name-line {
+  border-bottom: 1px solid #000;
+  display: inline-block;
+  width: 100%;
+  margin-top: 5px;
+}
+
+/* Invoice footer styles */
+.invoice-footer {
+  font-size: 14px;
+  text-align: center;
+  margin-top: 40px;
 }
 
 .invoiceAmount {
-  margin-top: 20px;
   font-size: 20px;
   font-weight: bold;
+  margin-top: 20px;
+}
+
+.email-insurance {
+  margin-top: 20px;
 }
