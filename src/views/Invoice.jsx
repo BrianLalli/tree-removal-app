@@ -93,56 +93,44 @@ const Invoice = () => {
                 ))}
               </ul>
             </div>
-            {/* Additional Notes section */}
-            {job.notes && (
-              <div className="invoice-section">
-                <h3>Additional Notes:</h3>
-                <p>{job.notes}</p>
-              </div>
-            )}
             <h3>Customer Details:</h3>
             <div>
-              Customer: <span>{customer.name}</span>
+              Name: <span>{customer.name}</span>
             </div>
             <div>
               Address: <span>{customer.address}</span>
             </div>
-            {/* <div>
-              Job Name: <span>{job.name}</span>
-            </div> */}
             <div>
               Job Date: <span>{new Date(job.jobDate).toDateString()}</span>
             </div>
           </div>
-          <div className="formElementParent">
-            {/* <div>
-              Invoice Id: <span>{job.id}</span>
-            </div>
-            <div>
-              Invoice Date: <span>{new Date().toDateString()}</span>
-            </div> */}
-            {/* <div>
-              Invoice Status: <span>{job.isPaid ? "Paid" : "Not Paid"}</span>
-            </div> */}
-          </div>
+          <div className="formElementParent"></div>
         </div>
         <div className="invoiceAmount">Total Price: ${job.price}</div>
         <div className="invoice-footer">
-          <div className="customer-signature">
-            <strong>Customer Name:</strong> <span>______________________</span>
+          <div className="signatures-container">
+            <div className="customer-section">
+              <div className="customer-name-line">
+                <div className="line"></div>
+                <strong>Customer Full Name</strong>
+              </div>
+              <div className="customer-signature-line">
+                <div className="line"></div>
+                <strong>Customer Signature</strong>
+              </div>
+            </div>
+            <div className="company-section">
+              <div className="company-name-line">
+                <div className="line"></div>
+                <strong>Company Rep.</strong>
+              </div>
+              <div className="company-signature-line">
+                <div className="line"></div>
+                <strong>Company Rep. Signature</strong>
+              </div>
+            </div>
           </div>
-          <div className="customer-signature">
-            <strong>Customer Signature:</strong>{" "}
-            <span>______________________</span>
-          </div>
-          <div className="company-signature">
-            <strong>Company Rep Name:</strong>{" "}
-            <span>______________________</span>
-          </div>
-          <div className="company-signature">
-            <strong>Company Rep Signature:</strong>{" "}
-            <span>______________________</span>
-          </div>
+
           <div className="email-insurance">
             <div>Email: twoguystreeservice@outlook.com</div>
             <div>Fully Insured</div>
