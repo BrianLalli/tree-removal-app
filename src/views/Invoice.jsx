@@ -58,7 +58,7 @@ const Invoice = () => {
             <Button
               onClick={() => {
                 setJobPaidStatus({ id: job.id, isPaid: false });
-                window.location.reload();
+                window.location.href = window.location.href;
               }}
               className="paidButton"
             >
@@ -68,7 +68,7 @@ const Invoice = () => {
             <Button
               onClick={() => {
                 setJobPaidStatus({ id: job.id, isPaid: true });
-                window.location.reload();
+                window.location.href = window.location.href;
               }}
               className="paidButton"
             >
@@ -171,7 +171,7 @@ const Invoice = () => {
               signedCustomerName: job.signedCustomerName,
               companyRepName: job.companyRepName,
             });
-            window.location.reload();
+            window.location.href = window.location.href;
           }}
           disabled={!job.signedCustomerName && !job.companyRepName}
           className="submitButton"
