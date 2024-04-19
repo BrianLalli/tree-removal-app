@@ -263,6 +263,7 @@ const JobDetail = ({
           name="price"
           value={details.price}
           onChange={handleChange}
+          disabled={details.isPaid || details.customerSigned}
           variant="outlined"
           fullWidth
         />

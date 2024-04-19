@@ -76,6 +76,12 @@ const Invoice = () => {
             </Button>
           )}
           <Button
+            onClick={() => navigator.clipboard.writeText(window.location.href)}
+            className="dashboardButton"
+          >
+            Copy to Clipboard
+          </Button>
+          <Button
             onClick={() => navigate("/working-board")}
             className="dashboardButton"
           >
