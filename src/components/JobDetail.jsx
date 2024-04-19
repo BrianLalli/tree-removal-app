@@ -280,6 +280,21 @@ const JobDetail = ({
           }
           label="Invoice Paid"
         />
+        <FormControlLabel
+          control={
+            <Checkbox
+              disabled
+              checked={details.customerSigned}
+              onChange={() => {
+                setDetails((prevDetails) => ({
+                  ...prevDetails,
+                  customerSigned: !details.customerSigned,
+                }));
+              }}
+            />
+          }
+          label="Contract Signed"
+        />
         <TextField
           label="Duration In Hours"
           name="durationInHours"

@@ -101,3 +101,19 @@ export const setJobPaidStatus = async ({ id, isPaid }) => {
     console.error("Failed to update job paid status", e);
   }
 };
+
+export const updateCustomerSigned = async ({
+  id,
+  signedCustomerName,
+  companyRepName,
+}) => {
+  try {
+    const { data } = await supabase
+      .from("jobs")
+      .update({ customerSigned: true, signedCustomerName, companyRepName })
+      .eq("id", id);
+    console.log("Successfully updated customer signed status!", data);
+  } catch (e) {
+    console.error("Failed to update customer signed status", e);
+  }
+};

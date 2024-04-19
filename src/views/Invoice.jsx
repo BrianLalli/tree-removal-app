@@ -1,9 +1,13 @@
 import { useToPng } from "@hugocxl/react-to-image";
-import { Button } from "@mui/material";
+import { Button, TextField } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../Invoice.css";
 import { useEffect, useState } from "react";
-import { getJobAndCustomerById, setJobPaidStatus } from "../api/jobs";
+import {
+  getJobAndCustomerById,
+  setJobPaidStatus,
+  updateCustomerSigned,
+} from "../api/jobs";
 import { useAppContext } from "../context/appContext";
 
 const Invoice = () => {
@@ -11,7 +15,6 @@ const Invoice = () => {
   const [job, setJob] = useState(null);
   const { user } = useAppContext();
   const navigate = useNavigate();
-  console.log(job);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -109,26 +112,42 @@ const Invoice = () => {
         <div className="invoiceAmount">Total Price: ${job.price}</div>
         <div className="invoice-footer">
           <div className="signatures-container">
-            <div className="customer-section">
-              <div className="customer-name-line">
-                <div className="line"></div>
-                <strong>Customer Full Name</strong>
-              </div>
-              <div className="customer-signature-line">
-                <div className="line"></div>
-                <strong>Customer Signature</strong>
-              </div>
-            </div>
-            <div className="company-section">
-              <div className="company-name-line">
-                <div className="line"></div>
-                <strong>Company Rep.</strong>
-              </div>
-              <div className="company-signature-line">
-                <div className="line"></div>
-                <strong>Company Rep. Signature</strong>
-              </div>
-            </div>
+            <TextField
+              label="Customer Signature"
+              name="customerSignatureName"
+              variant="standard"
+              disabled={job.customerSigned}
+              value={job.signedCustomerName}
+              onChange={(e) => {
+                setJob((prev) => ({
+                  ...prev,
+                  signedCustomerName: e.target.value,
+                }));
+              }}
+              fullWidth
+            />
+            <TextField
+              label="Company Rep. Signature"
+              name="companyRepName"
+              onChange={(e) => {
+                setJob((prev) => ({
+                  ...prev,
+                  companyRepName: e.target.value,
+                }));
+              }}
+              variant="standard"
+              disabled={job.customerSigned}
+              value={job.companyRepName}
+              fullWidth
+            />
+          </div>
+          <div>
+            <span className="signature-disclaimer">
+              By completing the typed signature input, I agree that my
+              electronic signature is the legal equivalent of my
+              manual/handwritten signature on this document. I consent to the
+              legally binding terms and conditions of this document.
+            </span>
           </div>
 
           <div className="email-insurance">
@@ -137,6 +156,23 @@ const Invoice = () => {
           </div>
         </div>
       </div>
+
+      {!job.customerSigned && user && (
+        <Button
+          onClick={async () => {
+            await updateCustomerSigned({
+              id: job.id,
+              signedCustomerName: job.signedCustomerName,
+              companyRepName: job.companyRepName,
+            });
+            window.location.reload();
+          }}
+          disabled={!job.signedCustomerName && !job.companyRepName}
+          className="submitButton"
+        >
+          Sign and Submit
+        </Button>
+      )}
     </div>
   );
 };

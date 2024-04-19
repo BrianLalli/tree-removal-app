@@ -23,7 +23,8 @@
 /* Style adjustments for buttons */
 .downloadButton,
 .paidButton,
-.dashboardButton {
+.dashboardButton,
+.submitButton {
   position: relative;
   display: block;
   margin-top: 10px;
@@ -93,8 +94,17 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-top: 70px;
+  margin-top: 20px;
   width: 100%;
+  flex-direction: column;
+  div {
+    margin: 10px auto;
+  }
+}
+
+.signature-disclaimer {
+  font-size: 12px;
+  margin-top: 10px;
 }
 
 .signature-section {
