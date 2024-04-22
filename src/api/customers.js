@@ -71,10 +71,20 @@ export const restoreCustomer = async ({ id }) => {
 
 export const getCustomers = async () => {
   try {
-    const { data } = await supabase.from("customers").select();
-    console.log("Successfully fetched customer!", data);
+    const { data, error } = await supabase
+      .from("customers")
+      .select()
+      .order('createdAt', { ascending: false }); // Update this line to match the correct column name
+
+    if (error) {
+      console.error("Failed to fetch customers", error);
+      throw error;
+    }
+    console.log("Successfully fetched customers!", data);
     return data;
   } catch (e) {
-    console.error("Failed to fetch customers", e);
+    console.error("General error when fetching customers", e);
+    throw e; // Rethrow to handle it in your component
   }
 };
+
