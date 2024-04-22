@@ -3,7 +3,7 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: dark light;
+  /* Set the base theme to dark explicitly */
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
 
@@ -27,14 +27,14 @@ a:hover {
 
 body {
   margin: 0;
-  display: block; /* changed from flex to block for better control on mobile */
+  display: block;
   min-height: 100vh;
-  width: 100%; /* ensure body does not cause horizontal scrolling */
-  overflow-x: hidden; /* prevent horizontal scrolling */
+  width: 100%;
+  overflow-x: hidden;
 }
 
 h1 {
-  font-size: 3.2em; /* consider using 'vw' units or scaling down for mobile */
+  font-size: 3.2em;
   line-height: 1.1;
 }
 
@@ -57,37 +57,26 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #3ab649;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
-}
+/* Removed prefers-color-scheme media query to enforce dark theme only */
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
   h1 {
-    font-size: 2.5em; /* scaled down for tablets and smaller devices */
+    font-size: 2.5em;
   }
   button {
-    padding: 0.8em 1.4em; /* larger padding for easier interaction */
+    padding: 0.8em 1.4em;
   }
 }
 
 @media (max-width: 375px) {
   h1 {
-    font-size: 2em; /* scaled down for mobile devices */
+    font-size: 2em;
   }
   button {
-    padding: 0.9em 1.6em; /* even larger padding for touch targets */
+    padding: 0.9em 1.6em;
   }
   a {
-    font-size: 0.9em; /* adjust links for smaller screens */
+    font-size: 0.9em;
   }
 }
