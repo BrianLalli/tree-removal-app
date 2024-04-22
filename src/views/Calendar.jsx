@@ -49,7 +49,9 @@ const MyCalendar = () => {
       timeZone: moment(job.jobDate).format('Z z') // Log timezone offset and abbreviation
     })));
   
-    const filteredJobs = fetchedJobs.filter((job) => job.status === 'group-3');
+    // Filter jobs to only include those in 'group-3' and have a non-null jobDate
+    const filteredJobs = fetchedJobs.filter((job) => job.status === 'group-3' && job.jobDate);
+  
     const calendarEvents = filteredJobs.map((job) => {
       // Assume jobDate is already in local time, so just parse it directly without utc()
       const startLocal = moment(job.jobDate).tz(localTimeZone, true); // the 'true' flag keeps the original time, interpreting it as local time
