@@ -7,7 +7,10 @@ export const saveJob = async (jobDetails) => {
   if (!jobDetails.price) jobDetails.price = 0;
   if (jobDetails.jobDate) {
     jobDetails.jobDate = formatDateForEasternTime(jobDetails.jobDate);
-  }  
+  }
+  if (jobDetails.callDate) {
+    jobDetails.callDate = formatDateForEasternTime(jobDetails.callDate);
+  }
   try {
     if (!jobDetails.id) {
       delete jobDetails.id;

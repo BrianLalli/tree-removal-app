@@ -18,6 +18,7 @@ import {
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { archiveJob, restoreJob, saveJob, setJobPaidStatus } from "../api/jobs";
 import Typeahead from "./Typeahead";
 import dayjs from "dayjs";
@@ -35,6 +36,7 @@ const statusOptions = {
 const initialJobState = {
   id: null,
   name: "",
+  callDate: new Date(),
   tasks: ["", "", ""],
   notes: "",
   jobDate: null,
@@ -147,6 +149,13 @@ const JobDetail = ({
     });
   };
 
+  const handleCallDateChange = (newValue) => {
+    setDetails((prevDetails) => ({
+      ...prevDetails,
+      callDate: newValue ? newValue.toISOString() : null, // Ensure to use ISO string if storing in DB
+    }));
+  };
+
   // const handleSharePDF = async () => {
   //   // Formatting the jobDate using dayjs for better readability in the PDF
   //   const formattedJobDate = dayjs(details.jobDate).format("YYYY-MM-DD");
@@ -224,6 +233,14 @@ const JobDetail = ({
           variant="outlined"
           fullWidth
         />
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DatePicker
+            label="Call Date"
+            value={details.callDate ? dayjs(details.callDate) : null}
+            onChange={handleCallDateChange}
+            renderInput={(params) => <TextField {...params} />}
+          />
+        </LocalizationProvider>
         <TextField
           label="Tasks 1"
           name="tasks1"
