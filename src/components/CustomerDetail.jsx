@@ -143,6 +143,8 @@ const CustomerDetail = ({ customer, onClose, refetch, setEditingJob }) => {
         <span>Jobs</span>
         {details?.jobs &&
           details?.jobs.map((job, index) => {
+            // Check if jobDate is a string before splitting
+            const jobDate = job.jobDate ? job.jobDate.split("T")[0] : "No Date";
             return (
               <Button
                 key={job + index}
@@ -150,9 +152,7 @@ const CustomerDetail = ({ customer, onClose, refetch, setEditingJob }) => {
                 color="primary"
                 onClick={() => setEditingJob(job)}
               >
-                {`${job.name}: ${job.jobDate.split("T")[0]} (${
-                  statusOptions[job.status]
-                })`}
+                {`${job.name}: ${jobDate} (${statusOptions[job.status]})`}
               </Button>
             );
           })}
