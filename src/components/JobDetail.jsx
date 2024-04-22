@@ -37,7 +37,7 @@ const initialJobState = {
   name: "",
   tasks: ["", "", ""],
   notes: "",
-  jobDate: new Date(),
+  jobDate: null,
   isPaid: false,
   durationInHours: 0,
   price: "",
@@ -307,9 +307,9 @@ const JobDetail = ({
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DateTimePicker
             label="Job Date and Time"
-            value={dayjs(Date.parse(details.jobDate))}
+            value={details.jobDate ? dayjs(Date.parse(details.jobDate)) : null}
             onChange={(newValue) => {
-              handleJobDateChange(new Date(newValue.$d));
+              handleJobDateChange(new Date(newValue?.$d));
             }}
           />
         </LocalizationProvider>

@@ -5,7 +5,9 @@ export const saveJob = async (jobDetails) => {
   if (!jobDetails.name) throw "name required to create job";
   if (!jobDetails.customerId) throw "customer required to create job";
   if (!jobDetails.price) jobDetails.price = 0;
-  jobDetails.jobDate = formatDateForEasternTime(jobDetails.jobDate);
+  if (jobDetails.jobDate) {
+    jobDetails.jobDate = formatDateForEasternTime(jobDetails.jobDate);
+  }  
   try {
     if (!jobDetails.id) {
       delete jobDetails.id;
