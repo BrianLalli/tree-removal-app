@@ -15,6 +15,17 @@ const Invoice = () => {
   const [job, setJob] = useState(null);
   const { user } = useAppContext();
   const navigate = useNavigate();
+  const [invoiceDate, setInvoiceDate] = useState(
+    new Date().toISOString().slice(0, 10)
+  );
+  const customDateInputStyle = {
+    fontSize: "1rem", // Adjust font size to match the form
+    padding: "10px", // Add some padding for better spacing
+    maxWidth: "200px", // Set a max width to keep it from getting too large
+    margin: "10px 0", // Add some margin for spacing
+    borderColor: "lightgray", // Border color to match other inputs
+    borderRadius: "4px", // Slightly rounded borders for a modern look
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -109,13 +120,22 @@ const Invoice = () => {
             <div>
               Address: <span>{customer.address}</span>
             </div>
-            <div>
-              Job Date: <span>{new Date(job.jobDate).toDateString()}</span>
-            </div>
           </div>
           <div className="formElementParent"></div>
         </div>
         <div className="invoiceAmount">Total Price: ${job.price}</div>
+        <div style={{ marginTop: '1rem', marginBottom: '0' }}>Invoice Date:</div>
+        <div>
+          <TextField
+            type="date"
+            value={invoiceDate}
+            onChange={(e) => setInvoiceDate(e.target.value)}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            style={customDateInputStyle}
+          />
+        </div>
         <div className="invoice-footer">
           <div className="signatures-container">
             <TextField
