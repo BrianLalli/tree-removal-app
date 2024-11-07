@@ -62,10 +62,10 @@ const WorkingBoard = () => {
       let groups = _.cloneDeep(initialGroups);
       const customers = await getCustomers();
       const jobs = await getJobs();
-      
+
       jobs.forEach((job) => {
         const jobPrice = parseFloat(job.price) || 0;
-        
+
         if (job?.archived) {
           // Add archived jobs to "Archived Jobs" group
           groups["group-5"].items.push(job);
@@ -75,15 +75,17 @@ const WorkingBoard = () => {
           groups[job.status]?.items.push(job);
           groups[job.status].totalRevenue += jobPrice;
         }
-  
+
         // Attach jobs to the relevant customer
-        const customer = customers.find((customer) => customer.id === job.customerId);
+        const customer = customers.find(
+          (customer) => customer.id === job.customerId
+        );
         if (customer) {
           customer.jobs = customer.jobs || [];
           customer.jobs.push(job);
         }
       });
-  
+
       setCustomers(customers);
       setCustomerGroups(groups);
     }
@@ -324,83 +326,95 @@ const WorkingBoard = () => {
             },
           }}
         >
-          {Object.entries(customerGroups).map(([groupId, group]) => (
-            (groupId !== "group-5" || showArchived) && (
-              <Droppable droppableId={groupId} key={groupId}>
-                {(provided, snapshot) => (
-                  <Box
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    sx={{
-                      backgroundColor: theme.palette.background.paper,
-                      padding: theme.spacing(2),
-                      borderRadius: theme.shape.borderRadius,
-                      boxShadow: snapshot.isDraggingOver ? 3 : 1,
-                      margin: theme.spacing(1),
-                      color: theme.palette.text.primary,
-                      display: "flex",
-                      flexDirection: "column",
-                    }}
-                  >
-                    <Typography variant="h6" sx={{ wordBreak: "break-word", marginBottom: 1 }}>
-                      {group.name} ({group.items.length})
-                    </Typography>
-                    <Typography
-                      component="div"
-                      sx={{ fontSize: "0.875rem", fontWeight: "bold", color: "green", marginBottom: 2 }}
-                    >
-                      Total Revenue: ${group.totalRevenue.toFixed(2)}
-                    </Typography>
-                    {group.items
-                      .slice(0, viewAllStatus[groupId] ? group.items.length : 10)
-                      .map((job, index) => (
-                        <Draggable
-                          key={job.id}
-                          draggableId={job.id.toString()}
-                          index={index}
-                        >
-                          {(provided, snapshot) => (
-                            <Box
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              onDoubleClick={() => setEditingJob({ ...job })}
-                              sx={{
-                                backgroundColor: snapshot.isDragging
-                                  ? alpha(theme.palette.action.hover, 0.8)
-                                  : alpha(group.color, 0.7),
-                                padding: theme.spacing(1),
-                                margin: theme.spacing(1),
-                                borderRadius: theme.shape.borderRadius,
-                                boxShadow: 1,
-                                cursor: "grab",
-                                color: theme.palette.getContrastText(
-                                  alpha(group.color, 0.7)
-                                ),
-                              }}
-                            >
-                              {job.name}
-                            </Box>
-                          )}
-                        </Draggable>
-                      ))}
-                    {provided.placeholder}
-                    <Button
-                      onClick={() => toggleViewAll(groupId)}
-                      variant="contained"
-                      color="white"
+          {Object.entries(customerGroups).map(
+            ([groupId, group]) =>
+              (groupId !== "group-5" || showArchived) && (
+                <Droppable droppableId={groupId} key={groupId}>
+                  {(provided, snapshot) => (
+                    <Box
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}
                       sx={{
-                        mt: 2,
-                        alignSelf: 'center',
+                        backgroundColor: theme.palette.background.paper,
+                        padding: theme.spacing(2),
+                        borderRadius: theme.shape.borderRadius,
+                        boxShadow: snapshot.isDraggingOver ? 3 : 1,
+                        margin: theme.spacing(1),
+                        color: theme.palette.text.primary,
+                        display: "flex",
+                        flexDirection: "column",
                       }}
                     >
-                      {viewAllStatus[groupId] ? "View Less" : "View All"}
-                    </Button>
-                  </Box>
-                )}
-              </Droppable>
-            )
-          ))}
+                      <Typography
+                        variant="h6"
+                        sx={{ wordBreak: "break-word", marginBottom: 1 }}
+                      >
+                        {group.name} ({group.items.length})
+                      </Typography>
+                      <Typography
+                        component="div"
+                        sx={{
+                          fontSize: "0.875rem",
+                          fontWeight: "bold",
+                          color: "green",
+                          marginBottom: 2,
+                        }}
+                      >
+                        Total Revenue: ${group.totalRevenue.toFixed(2)}
+                      </Typography>
+                      {group.items
+                        .slice(
+                          0,
+                          viewAllStatus[groupId] ? group.items.length : 10
+                        )
+                        .map((job, index) => (
+                          <Draggable
+                            key={job.id}
+                            draggableId={job.id.toString()}
+                            index={index}
+                          >
+                            {(provided, snapshot) => (
+                              <Box
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                onDoubleClick={() => setEditingJob({ ...job })}
+                                sx={{
+                                  backgroundColor: snapshot.isDragging
+                                    ? alpha(theme.palette.action.hover, 0.8)
+                                    : alpha(group.color, 0.7),
+                                  padding: theme.spacing(1),
+                                  margin: theme.spacing(1),
+                                  borderRadius: theme.shape.borderRadius,
+                                  boxShadow: 1,
+                                  cursor: "grab",
+                                  color: theme.palette.getContrastText(
+                                    alpha(group.color, 0.7)
+                                  ),
+                                }}
+                              >
+                                {job.name}
+                              </Box>
+                            )}
+                          </Draggable>
+                        ))}
+                      {provided.placeholder}
+                      <Button
+                        onClick={() => toggleViewAll(groupId)}
+                        variant="contained"
+                        color="white"
+                        sx={{
+                          mt: 2,
+                          alignSelf: "center",
+                        }}
+                      >
+                        {viewAllStatus[groupId] ? "View Less" : "View All"}
+                      </Button>
+                    </Box>
+                  )}
+                </Droppable>
+              )
+          )}
         </Box>
         {editingCustomer && (
           <CustomerDetail
@@ -424,13 +438,13 @@ const WorkingBoard = () => {
         )}
       </DragDropContext>
       <Button
-            onClick={() => setShowArchived(!showArchived)}
-            variant="contained"
-            color="primary"
-            sx={{ mt: 2, alignSelf: 'center' }}
-          >
-            {showArchived ? "Hide Archived Jobs" : "Show Archived Jobs"}
-          </Button>
+        onClick={() => setShowArchived(!showArchived)}
+        variant="contained"
+        color="primary"
+        sx={{ mt: 2, mb: 5, alignSelf: "center" }} // Add mb: 2 for bottom margin
+      >
+        {showArchived ? "Hide Archived Jobs" : "Show Archived Jobs"}
+      </Button>
     </Box>
   );
 };
