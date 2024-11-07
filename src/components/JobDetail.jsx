@@ -280,6 +280,8 @@ const JobDetail = ({
               onChange={(e) => handleTaskChange(index, e.target.value)}
               variant="outlined"
               fullWidth
+              multiline // Enable text wrapping
+              minRows={1} // Start with a single row, expand as needed
               InputProps={{
                 endAdornment: (
                   <IconButton
