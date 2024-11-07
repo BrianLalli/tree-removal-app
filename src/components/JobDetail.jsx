@@ -241,21 +241,13 @@ const JobDetail = ({
           zIndex: theme.zIndex.modal + 1,
         }}
       >
-        <FormControl fullWidth>
-          <InputLabel id="customer-select-label">Customer</InputLabel>
-          <Select
-            labelId="customer-select-label"
-            id="customer-select"
-            value={details.customerId || ""}
-            onChange={(e) => handleCustomerChange(e.target.value)}
-          >
-            {customers.map((customer) => (
-              <MenuItem key={customer.id} value={customer.id}>
-                {customer.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <Typeahead
+          label="Customer"
+          data={customers}
+          onSelection={(e) => handleCustomerChange(e.id)}
+          defaultValue={customers.find((item) => item.id === job.customerId)}
+          className="full-width-input" // Ensure consistent width
+        />
         <TextField
           label="Job Name"
           name="name"

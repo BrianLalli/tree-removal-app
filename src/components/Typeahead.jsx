@@ -7,7 +7,7 @@ const Typeahead = ({ label, data, onSelection, defaultValue }) => {
       freeSolo
       id="customer-search"
       style={{
-        width: "400px",
+        width: "100%",
         backgroundColor: "#eee",
         color: "white",
         borderRadius: "16px",
