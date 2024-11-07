@@ -1,82 +1,89 @@
-/* Breakpoints */
-@media (max-width: 600px) { /* Mobile */
-    .job-detail-container {
-      width: 100%; /* Full width on small screens */
-      max-width: none;
-      padding: 16px;
-      margin-top: 10px;
-      margin-bottom: 10px;
-    }
-  
-    .button-container button {
-      width: 100%; /* Full width buttons */
-      margin-bottom: 8px;
-      font-size: .7rem; /* Smaller font size for mobile */
-    }
-  }
-  
-  @media (min-width: 601px) and (max-width: 1024px) { /* Tablet */
-    .job-detail-container {
-      width: 80%;
-      max-width: none;
-      padding: 24px;
-      margin-top: 30px;
-    }
-  
-    .button-container {
-      flex-direction: column;
-    }
-  
-    .button-container button {
-      width: 100%; /* Full width buttons on medium screens */
-      margin-bottom: 10px;
-    }
-  }
-  
-  /* Desktop and above */
-  @media (min-width: 1025px) {
-    .job-detail-container {
-      width: 90%;
-      max-width: 600px; /* Limiting max width for large screens */
-      padding: 32px;
-      margin-top: 50px;
-    }
-  }
-  
-  /* Common Styles */
+/* Base Styles */
+.job-detail-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.9);
+  overflow-y: auto;
+  z-index: 1000;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 600px;
+  padding: 16px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  padding-top: 20px;
+  gap: 8px;
+}
+
+.button-container button,
+.add-task-button {
+  width: 100%;
+  font-size: 0.7rem;
+  margin: 0 4px;
+}
+
+.task-input-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.task-input-container .task-input {
+  flex-grow: 1;
+  width: calc(100% - 40px);
+}
+
+/* Enhanced Accessibility */
+.dialog-title {
+  font-size: 18px;
+}
+
+.menu-item {
+  font-size: 16px;
+}
+
+.full-width-input {
+  width: 100%;
+}
+
+/* Responsive Adjustments */
+@media (min-width: 601px) {
   .job-detail-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    background-color: rgba(0, 0, 0, 0.9);
-    overflow-y: auto;
-    z-index: 1000; /* High z-index to ensure it's above other content */
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    max-width: 80%;
+    padding: 24px;
+    margin-top: 30px;
   }
   
   .button-container {
-    display: flex;
-    justify-content: space-between;
-    padding-top: 20px;
+    flex-direction: row;
   }
-  
+
   .button-container button {
-    flex-grow: 1;
-    margin: 0 4px;
+    font-size: 1rem;
   }
-  
-  /* Enhancing the accessibility of Select menus and Dialog components */
-  .dialog-title {
-    font-size: 18px; /* Larger font for readability */
+}
+
+@media (min-width: 1025px) {
+  .job-detail-container {
+    max-width: 600px;
+    padding: 32px;
+    margin-top: 50px;
   }
-  
-  .menu-item {
-    font-size: 16px; /* Larger menu items for easier interaction */
-  }
-  
+}
+
+.full-width-input {
+  width: 100%;
+}

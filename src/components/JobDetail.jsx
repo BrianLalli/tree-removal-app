@@ -25,6 +25,8 @@ import dayjs from "dayjs";
 import { generatePDF, downloadPDF, shareFile } from "../utils/pdfGenerator";
 import "../assets/styles/JobDetail.css";
 import { useNavigate } from "react-router-dom";
+import { IconButton } from "@mui/material";
+import { Add, Delete } from "@mui/icons-material";
 
 const statusOptions = {
   "group-1": "Opportunities",
@@ -87,6 +89,28 @@ const JobDetail = ({
         [name]: value,
       }));
     }
+  };
+
+  const handleAddTask = () => {
+    setDetails((prevDetails) => ({
+      ...prevDetails,
+      tasks: [...prevDetails.tasks, ""], // Add an empty string for a new task
+    }));
+  };
+
+  const handleTaskChange = (index, value) => {
+    setDetails((prevDetails) => {
+      const newTasks = [...prevDetails.tasks];
+      newTasks[index] = value; // Update the task at the given index
+      return { ...prevDetails, tasks: newTasks };
+    });
+  };
+
+  const handleDeleteTask = (index) => {
+    setDetails((prevDetails) => {
+      const newTasks = prevDetails.tasks.filter((_, i) => i !== index); // Remove the task at the given index
+      return { ...prevDetails, tasks: newTasks };
+    });
   };
 
   const handleCustomerChange = (customerId) => {
@@ -217,14 +241,21 @@ const JobDetail = ({
           zIndex: theme.zIndex.modal + 1,
         }}
       >
-        <Typeahead
-          label="Customer"
-          data={customers}
-          onSelection={(e) => handleCustomerChange(e.id)}
-          defaultValue={
-            customers.filter((item) => item.id == job.customerId)[0]
-          }
-        />
+        <FormControl fullWidth>
+          <InputLabel id="customer-select-label">Customer</InputLabel>
+          <Select
+            labelId="customer-select-label"
+            id="customer-select"
+            value={details.customerId || ""}
+            onChange={(e) => handleCustomerChange(e.target.value)}
+          >
+            {customers.map((customer) => (
+              <MenuItem key={customer.id} value={customer.id}>
+                {customer.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
         <TextField
           label="Job Name"
           name="name"
@@ -241,30 +272,44 @@ const JobDetail = ({
             renderInput={(params) => <TextField {...params} />}
           />
         </LocalizationProvider>
-        <TextField
-          label="Tasks 1"
-          name="tasks1"
-          value={details.tasks[0]}
-          onChange={handleChange}
-          variant="outlined"
-          fullWidth
-        />
-        <TextField
-          label="Tasks 2"
-          name="tasks2"
-          value={details.tasks[1]}
-          onChange={handleChange}
-          variant="outlined"
-          fullWidth
-        />
-        <TextField
-          label="Tasks 3"
-          name="tasks3"
-          value={details.tasks[2]}
-          onChange={handleChange}
-          variant="outlined"
-          fullWidth
-        />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: theme.spacing(1),
+          }}
+        >
+          <span>Tasks</span>
+          {details.tasks.map((task, index) => (
+            <TextField
+              key={index}
+              label={`Task ${index + 1}`}
+              value={task}
+              onChange={(e) => handleTaskChange(index, e.target.value)}
+              variant="outlined"
+              fullWidth
+              InputProps={{
+                endAdornment: (
+                  <IconButton
+                    aria-label="delete task"
+                    onClick={() => handleDeleteTask(index)}
+                    edge="end"
+                  >
+                    <Delete />
+                  </IconButton>
+                ),
+              }}
+            />
+          ))}
+          <Button
+            variant="outlined"
+            startIcon={<Add />}
+            onClick={handleAddTask}
+            sx={{ width: "100%", mt: 1 }}
+          >
+            Add Task
+          </Button>
+        </div>
         <TextField
           label="Notes"
           name="notes"
