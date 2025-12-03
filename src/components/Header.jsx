@@ -26,6 +26,9 @@ function HideOnScroll(props) {
   );
 }
 
+const HIGHLIGHTS_URL =
+  "https://www.hudl.com/video/3/79017/5721ae5c4df6124b70e5735b";
+
 const Header = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -80,30 +83,42 @@ const Header = () => {
                   }}
                 />
               </Link>
-              {/* The rest of your items (if any) would go here */}
             </Box>
-            {/* Logout and Calendar Buttons aligned to the right */}
+
+            {/* Desktop nav (right side) */}
             <Box
               sx={{
                 display: { xs: "none", md: "flex" },
                 alignItems: "center",
-                justifyContent: "space-around", // This evenly spaces the children
+                justifyContent: "space-around",
                 padding: "0 10px",
                 gap: "10px",
               }}
             >
+              {/* Highlights – external link */}
+              <a
+                href={HIGHLIGHTS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ textDecoration: "none" }}
+              >
+                <Button color="primary" variant="contained">
+                  Highlights
+                </Button>
+              </a>
+
               <Link to="/calendar" style={{ textDecoration: "none" }}>
                 <Button color="primary" variant="contained">
                   Calendar
                 </Button>
               </Link>
-              {/* Ensure each Link and Button is a direct child of Box for consistent styling */}
+
               <Link to="/working-board" style={{ textDecoration: "none" }}>
                 <Button color="primary" variant="contained">
                   Dashboard
                 </Button>
               </Link>
-              {/* Direct Button for Logout */}
+
               <Button
                 color="primary"
                 variant="contained"
@@ -113,13 +128,14 @@ const Header = () => {
               </Button>
             </Box>
 
-            {/* Mobile Menu Icon Here */}
+            {/* Mobile Menu Icon */}
             <Box sx={{ display: { xs: "block", md: "none" } }}>
               <Button onClick={toggleDrawer(true)} color="primary">
                 <MenuIcon />
               </Button>
             </Box>
-            {/* Mobile Drawer Here */}
+
+            {/* Mobile Drawer */}
             <Drawer
               anchor="right"
               open={drawerOpen}
@@ -131,12 +147,24 @@ const Header = () => {
                 onClick={toggleDrawer(false)}
                 onKeyDown={toggleDrawer(false)}
               >
+                {/* Highlights – external link */}
+                <a
+                  href={HIGHLIGHTS_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "black", textDecoration: "none" }}
+                >
+                  <MenuItem>Highlights</MenuItem>
+                </a>
+
                 <Link to="/calendar" style={{ color: "black" }}>
                   <MenuItem>Calendar</MenuItem>
                 </Link>
+
                 <Link to="/working-board" style={{ color: "black" }}>
                   <MenuItem>Dashboard</MenuItem>
                 </Link>
+
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
               </Box>
             </Drawer>
