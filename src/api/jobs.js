@@ -67,8 +67,22 @@ export const restoreJob = async ({ id }) => {
 
 export const getJobs = async () => {
   try {
-    const { data } = await supabase.from("jobs").select();
-    console.log("Successfully fetched job!", data);
+    const { data, error, count } = await supabase
+      .from("jobs")
+      .select("*", { count: "exact" })         // get total count too (optional but nice)
+      .order("created_at", { ascending: false })
+      .range(0, 4999);                         // bump the cap well past current size
+
+    if (error) {
+      console.error("Failed to fetch jobs", error);
+      throw error;
+    }
+
+    console.log("Successfully fetched jobs!", {
+      totalCount: count,
+      returned: data.length,
+    });
+
     return data;
   } catch (e) {
     console.error("Failed to fetch jobs", e);

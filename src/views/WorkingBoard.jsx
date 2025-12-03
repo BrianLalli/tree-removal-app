@@ -10,44 +10,56 @@ import _ from "lodash";
 import JobDetail from "../components/JobDetail";
 import { getJobs, updateJobStatus } from "../api/jobs";
 
+const initialGroups = {
+  "group-1": {
+    id: "group-1",
+    name: "Opportunities",
+    color: "#FFD700",
+    items: [],
+    totalRevenue: 0,
+  },
+  "group-2": {
+    id: "group-2",
+    name: "Pending",
+    color: "#FF8C00",
+    items: [],
+    totalRevenue: 0,
+  },
+  "group-3": {
+    id: "group-3",
+    name: "Upcoming Jobs",
+    color: "#1E90FF",
+    items: [],
+    totalRevenue: 0,
+  },
+  "group-4": {
+    id: "group-4",
+    name: "Completed Jobs",
+    color: "#32CD32",
+    items: [],
+    totalRevenue: 0,
+  },
+  "group-5": {
+    id: "group-5",
+    name: "Archived Jobs",
+    color: "#A9A9A9", // Gray color for archived
+    items: [],
+    totalRevenue: 0,
+  },
+};
+
+// Sort items in each group so newest jobs are first
+const sortGroupsByDate = (groups) => {
+  Object.values(groups).forEach((group) => {
+    group.items.sort((a, b) => {
+      const aDate = new Date(a.created_at || a.jobDate || 0);
+      const bDate = new Date(b.created_at || b.jobDate || 0);
+      return bDate - aDate; // newest first
+    });
+  });
+};
+
 const WorkingBoard = () => {
-  const initialGroups = {
-    "group-1": {
-      id: "group-1",
-      name: "Opportunities",
-      color: "#FFD700",
-      items: [],
-      totalRevenue: 0,
-    },
-    "group-2": {
-      id: "group-2",
-      name: "Pending",
-      color: "#FF8C00",
-      items: [],
-      totalRevenue: 0,
-    },
-    "group-3": {
-      id: "group-3",
-      name: "Upcoming Jobs",
-      color: "#1E90FF",
-      items: [],
-      totalRevenue: 0,
-    },
-    "group-4": {
-      id: "group-4",
-      name: "Completed Jobs",
-      color: "#32CD32",
-      items: [],
-      totalRevenue: 0,
-    },
-    "group-5": {
-      id: "group-5",
-      name: "Archived Jobs",
-      color: "#A9A9A9", // Gray color for archived
-      items: [],
-      totalRevenue: 0,
-    },
-  };
   const [customerGroups, setCustomerGroups] = useState({});
   const theme = useTheme();
   const [editingCustomer, setEditingCustomer] = useState(null);
@@ -63,6 +75,18 @@ const WorkingBoard = () => {
       const customers = await getCustomers();
       const jobs = await getJobs();
 
+      console.log(
+        "[DEBUG] jobs from API (non-archived group-1):",
+        jobs
+          .filter((j) => j.status === "group-1" && !j.archived)
+          .map((j) => ({
+            id: j.id,
+            name: j.name,
+            created_at: j.created_at,
+            customerId: j.customerId,
+          }))
+      );
+
       jobs.forEach((job) => {
         const jobPrice = parseFloat(job.price) || 0;
 
@@ -72,8 +96,10 @@ const WorkingBoard = () => {
           groups["group-5"].totalRevenue += jobPrice;
         } else {
           // Handle non-archived jobs as usual
-          groups[job.status]?.items.push(job);
-          groups[job.status].totalRevenue += jobPrice;
+          if (groups[job.status]) {
+            groups[job.status].items.push(job);
+            groups[job.status].totalRevenue += jobPrice;
+          }
         }
 
         // Attach jobs to the relevant customer
@@ -85,6 +111,9 @@ const WorkingBoard = () => {
           customer.jobs.push(job);
         }
       });
+
+      // Ensure newest jobs appear first in each column
+      sortGroupsByDate(groups);
 
       setCustomers(customers);
       setCustomerGroups(groups);
@@ -98,14 +127,17 @@ const WorkingBoard = () => {
         let groups = _.cloneDeep(initialGroups);
         const customers = await getCustomers();
         const jobs = await getJobs();
+
         jobs.forEach((job) => {
           if (!job?.archived) {
             const jobPrice = parseFloat(job.price) || 0;
-            groups[job.status]?.items.push(job);
-            if (groups[job.status].totalRevenue === undefined) {
-              groups[job.status].totalRevenue = 0;
+            if (groups[job.status]) {
+              groups[job.status].items.push(job);
+              if (groups[job.status].totalRevenue === undefined) {
+                groups[job.status].totalRevenue = 0;
+              }
+              groups[job.status].totalRevenue += jobPrice;
             }
-            groups[job.status].totalRevenue += jobPrice;
           }
           const customer = customers.find(
             (customer) => customer.id === job.customerId
@@ -115,6 +147,10 @@ const WorkingBoard = () => {
             customer.jobs.push(job);
           }
         });
+
+        // Ensure newest jobs appear first in each column
+        sortGroupsByDate(groups);
+
         setCustomers(customers);
         setCustomerGroups(groups);
         setRefetchData(false);
@@ -245,6 +281,7 @@ const WorkingBoard = () => {
       return { ...prevGroups };
     });
   };
+
   const handleDeleteJob = (jobId) => {
     setCustomerGroups((prevGroups) => {
       Object.keys(prevGroups).forEach((group) => {
@@ -282,7 +319,7 @@ const WorkingBoard = () => {
             color="primary"
             style={{ width: "200px", margin: "auto", marginBottom: 15 }}
             sx={{ mt: 1 }}
-            onClick={setEditingCustomer}
+            onClick={() => setEditingCustomer({})}
           >
             + New Customer
           </Button>
@@ -291,7 +328,7 @@ const WorkingBoard = () => {
             color="primary"
             style={{ width: "200px", margin: "auto", marginBottom: 15 }}
             sx={{ mt: 1 }}
-            onClick={setEditingJob}
+            onClick={() => setEditingJob({})}
           >
             + New Job
           </Button>
@@ -365,7 +402,7 @@ const WorkingBoard = () => {
                       {group.items
                         .slice(
                           0,
-                          viewAllStatus[groupId] ? group.items.length : 10
+                          viewAllStatus[groupId] ? group.items.length : 20 // show up to 20 newest by default
                         )
                         .map((job, index) => (
                           <Draggable

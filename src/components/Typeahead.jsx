@@ -18,6 +18,11 @@ const Typeahead = ({ label, data, onSelection, defaultValue }) => {
       onChange={(event, newValue) => {
         onSelection(newValue);
       }}
+      renderOption={(props, option) => (
+        <li {...props} key={option.id}>
+          {option.name}
+        </li>
+      )}
       renderInput={(params) => (
         <TextField
           {...params}
