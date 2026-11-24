@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { v4 as uuidv4 } from "uuid"; // Ensure uuid is installed
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { Box, Button, Typography, useTheme } from "@mui/material";
 import { alpha } from "@mui/material/styles";
@@ -9,6 +8,9 @@ import { getCustomers, updateCustomerStatus } from "../api/customers";
 import _ from "lodash";
 import JobDetail from "../components/JobDetail";
 import { getJobs, updateJobStatus } from "../api/jobs";
+import AddIcon from "@mui/icons-material/Add";
+import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
+import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 
 const initialGroups = {
   "group-1": {
@@ -69,94 +71,48 @@ const WorkingBoard = () => {
   const [viewAllStatus, setViewAllStatus] = useState({});
   const [showArchived, setShowArchived] = useState(false);
 
-  useEffect(() => {
-    async function fetchCustomersAndJobsOnMount() {
-      let groups = _.cloneDeep(initialGroups);
-      const customers = await getCustomers();
-      const jobs = await getJobs();
+  const loadBoard = async () => {
+    const groups = _.cloneDeep(initialGroups);
+    const customers = await getCustomers();
+    const jobs = (await getJobs()) || [];
 
-      console.log(
-        "[DEBUG] jobs from API (non-archived group-1):",
-        jobs
-          .filter((j) => j.status === "group-1" && !j.archived)
-          .map((j) => ({
-            id: j.id,
-            name: j.name,
-            created_at: j.created_at,
-            customerId: j.customerId,
-          }))
+    jobs.forEach((job) => {
+      const jobPrice = parseFloat(job.price) || 0;
+
+      if (job?.archived) {
+        // Add archived jobs to "Archived Jobs" group
+        groups["group-5"].items.push(job);
+        groups["group-5"].totalRevenue += jobPrice;
+      } else if (groups[job.status]) {
+        groups[job.status].items.push(job);
+        groups[job.status].totalRevenue += jobPrice;
+      }
+
+      // Attach jobs to the relevant customer
+      const customer = customers.find(
+        (customer) => customer.id === job.customerId
       );
+      if (customer) {
+        customer.jobs = customer.jobs || [];
+        customer.jobs.push(job);
+      }
+    });
 
-      jobs.forEach((job) => {
-        const jobPrice = parseFloat(job.price) || 0;
+    // Ensure newest jobs appear first in each column
+    sortGroupsByDate(groups);
 
-        if (job?.archived) {
-          // Add archived jobs to "Archived Jobs" group
-          groups["group-5"].items.push(job);
-          groups["group-5"].totalRevenue += jobPrice;
-        } else {
-          // Handle non-archived jobs as usual
-          if (groups[job.status]) {
-            groups[job.status].items.push(job);
-            groups[job.status].totalRevenue += jobPrice;
-          }
-        }
+    setCustomers(customers);
+    setCustomerGroups(groups);
+  };
 
-        // Attach jobs to the relevant customer
-        const customer = customers.find(
-          (customer) => customer.id === job.customerId
-        );
-        if (customer) {
-          customer.jobs = customer.jobs || [];
-          customer.jobs.push(job);
-        }
-      });
-
-      // Ensure newest jobs appear first in each column
-      sortGroupsByDate(groups);
-
-      setCustomers(customers);
-      setCustomerGroups(groups);
-    }
-    fetchCustomersAndJobsOnMount();
+  useEffect(() => {
+    loadBoard();
   }, []);
 
   useEffect(() => {
-    async function refetchDataOnUpdate() {
-      if (refetchData) {
-        let groups = _.cloneDeep(initialGroups);
-        const customers = await getCustomers();
-        const jobs = await getJobs();
-
-        jobs.forEach((job) => {
-          if (!job?.archived) {
-            const jobPrice = parseFloat(job.price) || 0;
-            if (groups[job.status]) {
-              groups[job.status].items.push(job);
-              if (groups[job.status].totalRevenue === undefined) {
-                groups[job.status].totalRevenue = 0;
-              }
-              groups[job.status].totalRevenue += jobPrice;
-            }
-          }
-          const customer = customers.find(
-            (customer) => customer.id === job.customerId
-          );
-          if (customer) {
-            customer.jobs = customer.jobs || [];
-            customer.jobs.push(job);
-          }
-        });
-
-        // Ensure newest jobs appear first in each column
-        sortGroupsByDate(groups);
-
-        setCustomers(customers);
-        setCustomerGroups(groups);
-        setRefetchData(false);
-      }
+    if (refetchData) {
+      loadBoard().finally(() => setRefetchData(false));
     }
-    refetchDataOnUpdate();
   }, [refetchData]);
 
   const reorder = (list, startIndex, endIndex) => {
@@ -303,35 +259,85 @@ const WorkingBoard = () => {
     }));
   };
 
+  const activeGroups = ["group-1", "group-2", "group-3"];
+  const openJobCount = activeGroups.reduce(
+    (n, id) => n + (customerGroups[id]?.items.length || 0),
+    0
+  );
+  const pipelineValue = activeGroups.reduce(
+    (n, id) => n + (customerGroups[id]?.totalRevenue || 0),
+    0
+  );
+  const formatMoney = (n) =>
+    n.toLocaleString(undefined, {
+      style: "currency",
+      currency: "USD",
+      maximumFractionDigits: 0,
+    });
+
   return (
     <Box
       sx={{
-        pt: theme.spacing(8), // Top padding to avoid overlap with AppBar
+        pt: { xs: 5, sm: 6 },
         pb: theme.spacing(7), // Bottom padding to avoid overlap with Footer
         display: "flex",
         flexDirection: "column", // Stack children vertically
+        textAlign: "left",
       }}
     >
       <DragDropContext onDragEnd={onDragEnd}>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <Button
-            variant="contained"
-            color="primary"
-            style={{ width: "200px", margin: "auto", marginBottom: 15 }}
-            sx={{ mt: 1 }}
-            onClick={() => setEditingCustomer({})}
-          >
-            + New Customer
-          </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            style={{ width: "200px", margin: "auto", marginBottom: 15 }}
-            sx={{ mt: 1 }}
-            onClick={() => setEditingJob({})}
-          >
-            + New Job
-          </Button>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            alignItems: { xs: "stretch", md: "flex-end" },
+            justifyContent: "space-between",
+            gap: 2,
+            px: { xs: 2, sm: 1 },
+            mb: 2.5,
+          }}
+        >
+          <Box>
+            <Typography
+              variant="h5"
+              sx={{ color: "#fff", fontWeight: 700, letterSpacing: "-0.02em" }}
+            >
+              Dashboard
+            </Typography>
+            <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.6)" }}>
+              {openJobCount} active jobs · {formatMoney(pipelineValue)} in the pipeline
+            </Typography>
+          </Box>
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <Button
+              variant="outlined"
+              startIcon={<PersonAddAlt1Icon />}
+              onClick={() => setEditingCustomer({})}
+              sx={{
+                flex: { xs: 1, md: "none" },
+                whiteSpace: "nowrap",
+                color: "#fff",
+                borderColor: "rgba(255,255,255,0.25)",
+                "&:hover": {
+                  borderColor: "rgba(255,255,255,0.5)",
+                  bgcolor: "rgba(255,255,255,0.06)",
+                },
+              }}
+            >
+              New Customer
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<AddIcon />}
+              onClick={() => setEditingJob({})}
+              sx={{ flex: { xs: 1, md: "none" } }}
+            >
+              New Job
+            </Button>
+          </Box>
+        </Box>
+        <Box sx={{ px: { xs: 2, sm: 1 }, mb: 1 }}>
           <SearchBar
             onSelect={setEditingCustomer}
             data={customers.map((customer) => {
@@ -339,28 +345,21 @@ const WorkingBoard = () => {
               return { ...customer, labelKey };
             })}
           />
-        </div>
+        </Box>
         <Box
           sx={{
-            display: "flex",
-            justifyContent: "flex-start",
-            padding: theme.spacing(2),
-            backgroundColor: theme.palette.background.primary,
-            gap: theme.spacing(2),
-            margin: "auto",
-            flexWrap: "wrap",
-            overflow: "auto",
-            maxWidth: "100%",
-            "& > *": {
-              flex: "1 1 auto",
-              width: {
-                xs: "100%",
-                sm: "48%",
-                md: "30%",
-                lg: "auto",
-              },
-              minWidth: 200,
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "1fr",
+              sm: "repeat(2, minmax(0, 1fr))",
+              lg: showArchived
+                ? "repeat(5, minmax(0, 1fr))"
+                : "repeat(4, minmax(0, 1fr))",
             },
+            gap: 2,
+            p: { xs: 2, sm: 1 },
+            pt: { xs: 2, sm: 2 },
+            alignItems: "start",
           }}
         >
           {Object.entries(customerGroups).map(
@@ -372,33 +371,66 @@ const WorkingBoard = () => {
                       {...provided.droppableProps}
                       ref={provided.innerRef}
                       sx={{
-                        backgroundColor: theme.palette.background.paper,
-                        padding: theme.spacing(2),
-                        borderRadius: theme.shape.borderRadius,
-                        boxShadow: snapshot.isDraggingOver ? 3 : 1,
-                        margin: theme.spacing(1),
+                        backgroundColor: snapshot.isDraggingOver
+                          ? alpha(group.color, 0.08)
+                          : theme.palette.background.paper,
+                        p: 1.5,
+                        borderRadius: "14px",
+                        border: `1px solid ${
+                          snapshot.isDraggingOver
+                            ? alpha(group.color, 0.6)
+                            : "transparent"
+                        }`,
+                        boxShadow: "0 1px 2px rgba(0,0,0,0.2), 0 8px 24px rgba(0,0,0,0.18)",
                         color: theme.palette.text.primary,
                         display: "flex",
                         flexDirection: "column",
+                        minWidth: 0,
+                        transition: "background-color 150ms, border-color 150ms",
                       }}
                     >
-                      <Typography
-                        variant="h6"
-                        sx={{ wordBreak: "break-word", marginBottom: 1 }}
-                      >
-                        {group.name} ({group.items.length})
-                      </Typography>
-                      <Typography
-                        component="div"
-                        sx={{
-                          fontSize: "0.875rem",
-                          fontWeight: "bold",
-                          color: "green",
-                          marginBottom: 2,
-                        }}
-                      >
-                        Total Revenue: ${group.totalRevenue.toFixed(2)}
-                      </Typography>
+                      <Box sx={{ px: 0.5, pt: 0.5, pb: 1.25 }}>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                          <Box
+                            sx={{
+                              width: 10,
+                              height: 10,
+                              borderRadius: "50%",
+                              bgcolor: group.color,
+                              flexShrink: 0,
+                            }}
+                          />
+                          <Typography
+                            variant="subtitle1"
+                            sx={{ fontWeight: 700, flex: 1, wordBreak: "break-word" }}
+                          >
+                            {group.name}
+                          </Typography>
+                          <Box
+                            sx={{
+                              px: 1,
+                              py: 0.125,
+                              borderRadius: 999,
+                              bgcolor: alpha(group.color, 0.14),
+                              fontSize: "0.75rem",
+                              fontWeight: 700,
+                            }}
+                          >
+                            {group.items.length}
+                          </Box>
+                        </Box>
+                        <Typography
+                          component="div"
+                          sx={{
+                            fontSize: "0.8125rem",
+                            fontWeight: 600,
+                            color: "success.main",
+                            mt: 0.5,
+                          }}
+                        >
+                          Total Revenue: ${group.totalRevenue.toFixed(2)}
+                        </Typography>
+                      </Box>
                       {group.items
                         .slice(
                           0,
@@ -417,36 +449,72 @@ const WorkingBoard = () => {
                                 {...provided.dragHandleProps}
                                 onDoubleClick={() => setEditingJob({ ...job })}
                                 sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 1,
                                   backgroundColor: snapshot.isDragging
-                                    ? alpha(theme.palette.action.hover, 0.8)
-                                    : alpha(group.color, 0.7),
-                                  padding: theme.spacing(1),
-                                  margin: theme.spacing(1),
-                                  borderRadius: theme.shape.borderRadius,
-                                  boxShadow: 1,
+                                    ? "#ffffff"
+                                    : alpha(group.color, 0.09),
+                                  borderLeft: `3px solid ${group.color}`,
+                                  px: 1.25,
+                                  py: 1,
+                                  mb: 0.75,
+                                  borderRadius: "8px",
+                                  boxShadow: snapshot.isDragging
+                                    ? "0 12px 28px rgba(0,0,0,0.25)"
+                                    : "none",
                                   cursor: "grab",
-                                  color: theme.palette.getContrastText(
-                                    alpha(group.color, 0.7)
-                                  ),
+                                  fontSize: "0.9rem",
+                                  fontWeight: 500,
+                                  lineHeight: 1.35,
+                                  color: theme.palette.text.primary,
+                                  transition: "background-color 120ms",
+                                  "&:hover": {
+                                    backgroundColor: alpha(group.color, 0.16),
+                                  },
                                 }}
                               >
-                                {job.name}
+                                <Box sx={{ flex: 1, minWidth: 0, wordBreak: "break-word" }}>
+                                  {job.name}
+                                </Box>
+                                {parseFloat(job.price) > 0 && (
+                                  <Box
+                                    sx={{
+                                      fontSize: "0.75rem",
+                                      fontWeight: 600,
+                                      color: "text.secondary",
+                                      whiteSpace: "nowrap",
+                                    }}
+                                  >
+                                    ${parseFloat(job.price).toLocaleString()}
+                                  </Box>
+                                )}
                               </Box>
                             )}
                           </Draggable>
                         ))}
                       {provided.placeholder}
-                      <Button
-                        onClick={() => toggleViewAll(groupId)}
-                        variant="contained"
-                        color="white"
-                        sx={{
-                          mt: 2,
-                          alignSelf: "center",
-                        }}
-                      >
-                        {viewAllStatus[groupId] ? "View Less" : "View All"}
-                      </Button>
+                      {group.items.length === 0 && (
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ textAlign: "center", py: 2 }}
+                        >
+                          No jobs
+                        </Typography>
+                      )}
+                      {group.items.length > 20 && (
+                        <Button
+                          onClick={() => toggleViewAll(groupId)}
+                          variant="text"
+                          size="small"
+                          sx={{ mt: 0.5, alignSelf: "center" }}
+                        >
+                          {viewAllStatus[groupId]
+                            ? "View Less"
+                            : `View All (${group.items.length})`}
+                        </Button>
+                      )}
                     </Box>
                   )}
                 </Droppable>
@@ -476,9 +544,15 @@ const WorkingBoard = () => {
       </DragDropContext>
       <Button
         onClick={() => setShowArchived(!showArchived)}
-        variant="contained"
-        color="primary"
-        sx={{ mt: 2, mb: 5, alignSelf: "center" }} // Add mb: 2 for bottom margin
+        variant="text"
+        startIcon={<Inventory2OutlinedIcon />}
+        sx={{
+          mt: 2,
+          mb: 5,
+          alignSelf: "center",
+          color: "rgba(255,255,255,0.7)",
+          "&:hover": { color: "#fff", bgcolor: "rgba(255,255,255,0.06)" },
+        }}
       >
         {showArchived ? "Hide Archived Jobs" : "Show Archived Jobs"}
       </Button>

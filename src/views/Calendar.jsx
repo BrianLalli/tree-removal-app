@@ -14,16 +14,16 @@ const localTimeZone = moment.tz.guess() || "America/New_York";
 const localizer = momentLocalizer(moment);
 
 const eventStyleGetter = (event, start, end, isSelected) => {
-  let backgroundColor = "#3174ad";
+  let backgroundColor = "#1E88E5";
   if (event.resource.status === "group-3") {
-    backgroundColor = "#5cb85c";
+    backgroundColor = "#3ab649";
   }
   return {
     style: {
       backgroundColor,
       borderRadius: "6px",
-      opacity: 0.8,
-      color: "black",
+      color: "#ffffff",
+      fontWeight: 500,
       border: "0px",
       display: "block",
     }
@@ -97,9 +97,11 @@ const MyCalendar = () => {
   const calendarStyles = {
     height: "calc(100vh - var(--header-height) - var(--footer-height))",
     padding: theme.spacing(2),
-    backgroundColor: theme.palette.background.default,
+    backgroundColor: theme.palette.background.paper,
     color: theme.palette.text.primary,
-    borderRadius: theme.shape.borderRadius,
+    borderRadius: 14,
+    boxShadow: "0 1px 2px rgba(0,0,0,0.2), 0 8px 24px rgba(0,0,0,0.18)",
+    marginTop: theme.spacing(3),
     width: "100%",
     overflow: "auto",
     boxSizing: "border-box",

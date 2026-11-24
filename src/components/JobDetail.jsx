@@ -27,6 +27,9 @@ import "../assets/styles/JobDetail.css";
 import { useNavigate } from "react-router-dom";
 import { IconButton } from "@mui/material";
 import { Add, Delete } from "@mui/icons-material";
+import { Box, useMediaQuery } from "@mui/material";
+import ModalShell from "./ModalShell";
+import CustomerJobHistory from "./CustomerJobHistory";
 
 const statusOptions = {
   "group-1": "Opportunities",
@@ -62,6 +65,7 @@ const JobDetail = ({
   const [details, setDetails] = useState(initialJobState);
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const isWide = useMediaQuery(theme.breakpoints.up("md"));
 
   useEffect(() => {
     if (job.id) {
@@ -203,242 +207,225 @@ const JobDetail = ({
   //   }
   // };
 
-  return (
-    <div
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        alignItems: "flex-start", // Aligns the form to the top, especially important on small screens
-        justifyContent: "center",
-        backgroundColor: "rgba(0, 0, 0, 0.9)",
-        paddingTop: "3vh", // Adds some space at the top
-        zIndex: theme.zIndex.modal,
-        overflowY: "auto", // Allows scrolling on small screens
-      }}
-    >
-      <div
-        style={{
-          marginTop: "20px", // Additional top margin if needed
-          paddingBottom: theme.spacing(2),
-          padding: theme.spacing(4),
-          backgroundColor: theme.palette.background.default,
-          boxShadow: theme.shadows[5],
-          display: "flex",
-          flexDirection: "column",
-          width: "90%", // Set width to 90% of the viewport
-          maxWidth: "600px", // Maximum width for larger screens
-          maxHeight: "80vh", // Max height to ensure it fits in the viewport
-          overflowY: "auto", // Scroll inside the form if content is too tall
-          color: theme.palette.text.primary,
-          border: `4px solid ${theme.palette.primary.main}`,
-          borderRadius: theme.shape.borderRadius,
-          textAlign: "center",
-          gap: theme.spacing(1), // Reduced gap to save space
-          zIndex: theme.zIndex.modal + 1,
-        }}
-      >
-        <Typeahead
-          label="Customer"
-          data={customers}
-          onSelection={(e) => handleCustomerChange(e.id)}
-          defaultValue={customers.find((item) => item.id === job.customerId)}
-          className="full-width-input" // Ensure consistent width
-        />
-        <TextField
-          label="Job Name"
-          name="name"
-          value={details.name}
-          onChange={handleChange}
-          variant="outlined"
-          fullWidth
-        />
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker
-            label="Call Date"
-            value={details.callDate ? dayjs(details.callDate) : null}
-            onChange={handleCallDateChange}
-            renderInput={(params) => <TextField {...params} />}
-          />
-        </LocalizationProvider>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: theme.spacing(1),
-          }}
-        >
-          <span>Tasks</span>
-          {details.tasks.map((task, index) => (
-            <TextField
-              key={index}
-              label={`Task ${index + 1}`}
-              value={task}
-              onChange={(e) => handleTaskChange(index, e.target.value)}
-              variant="outlined"
-              fullWidth
-              multiline // Enable text wrapping
-              minRows={1} // Start with a single row, expand as needed
-              InputProps={{
-                endAdornment: (
-                  <IconButton
-                    aria-label="delete task"
-                    onClick={() => handleDeleteTask(index)}
-                    edge="end"
-                  >
-                    <Delete />
-                  </IconButton>
-                ),
-              }}
-            />
-          ))}
-          <Button
-            variant="outlined"
-            startIcon={<Add />}
-            onClick={handleAddTask}
-            sx={{ width: "100%", mt: 1 }}
-          >
-            Add Task
-          </Button>
-        </div>
-        <TextField
-          label="Notes"
-          name="notes"
-          value={details.notes}
-          onChange={handleChange}
-          variant="outlined"
-          fullWidth
-          multiline
-          rows={4}
-        />
-        <TextField
-          label="Price"
-          name="price"
-          value={details.price}
-          onChange={handleChange}
-          disabled={details.isPaid || details.customerSigned}
-          variant="outlined"
-          fullWidth
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={details.isPaid}
-              onChange={() => {
-                setDetails((prevDetails) => ({
-                  ...prevDetails,
-                  isPaid: !details.isPaid,
-                }));
-              }}
-            />
-          }
-          label="Invoice Paid"
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              disabled
-              checked={details.customerSigned}
-              onChange={() => {
-                setDetails((prevDetails) => ({
-                  ...prevDetails,
-                  customerSigned: !details.customerSigned,
-                }));
-              }}
-            />
-          }
-          label="Contract Signed"
-        />
-        <TextField
-          label="Duration In Hours"
-          name="durationInHours"
-          value={details.durationInHours}
-          onChange={handleChange}
-          variant="outlined"
-          fullWidth
-        />
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DateTimePicker
-            label="Job Date and Time"
-            value={details.jobDate ? dayjs(Date.parse(details.jobDate)) : null}
-            onChange={(newValue) => {
-              handleJobDateChange(new Date(newValue?.$d));
-            }}
-          />
-        </LocalizationProvider>
-        <FormControl fullWidth margin="normal">
-          <InputLabel id="status-select-label">Status</InputLabel>
-          <Select
-            labelId="status-select-label"
-            id="status-select"
-            value={details.status}
-            label="Status"
-            onChange={handleStatusChange}
-          >
-            {Object.keys(statusOptions).map((groupId) => (
-              <MenuItem value={groupId} key={groupId}>
-                {statusOptions[groupId]}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <div
-          className="button-container"
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            marginTop: theme.spacing(1),
-          }}
-        >
-          <Button variant="contained" color="primary" onClick={handleSave}>
-            Save
-          </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleViewCustomer}
-          >
-            View Customer
-          </Button>
+  const selectedCustomer = getSelectedCustomer(details.customerId);
 
-          {details.archived ? (
-            <Button
-              variant="contained"
-              sx={{
-                bgcolor: theme.palette.warning.main,
-                "&:hover": { bgcolor: theme.palette.warning.dark },
-              }}
-              onClick={handleRestore}
-            >
-              Restore
-            </Button>
-          ) : (
-            <Button
-              variant="contained"
-              sx={{
-                bgcolor: theme.palette.error.main,
-                "&:hover": { bgcolor: theme.palette.error.dark },
-              }}
-              onClick={handleOpen}
-            >
-              Archive
-            </Button>
+  const footer = (
+    <>
+      {details.archived ? (
+        <Button
+          color="warning"
+          onClick={handleRestore}
+          sx={{ mr: "auto" }}
+        >
+          Restore
+        </Button>
+      ) : (
+        job.id && (
+          <Button color="error" onClick={handleOpen} sx={{ mr: "auto" }}>
+            Archive
+          </Button>
+        )
+      )}
+      <Button variant="text" onClick={onClose}>
+        Close
+      </Button>
+      <Button
+        variant="outlined"
+        onClick={handleViewCustomer}
+        disabled={!selectedCustomer}
+      >
+        View Customer
+      </Button>
+      {job.id && (
+        <Button variant="outlined" onClick={handleViewInvoice}>
+          View Invoice
+        </Button>
+      )}
+      <Button variant="contained" color="primary" onClick={handleSave}>
+        Save
+      </Button>
+    </>
+  );
+
+  const history = (
+    <CustomerJobHistory
+      customerId={details.customerId}
+      excludeJobId={job.id}
+      title={selectedCustomer ? `${selectedCustomer.name}'s Job History` : "Job History"}
+    />
+  );
+
+  return (
+    <>
+      <ModalShell
+        title={job.id ? details.name || "Edit Job" : "New Job"}
+        subtitle={selectedCustomer?.name !== details.name ? selectedCustomer?.name : null}
+        onClose={onClose}
+        footer={footer}
+        maxWidth={details.customerId && isWide ? 1040 : 640}
+      >
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: details.customerId && isWide ? "minmax(0, 1fr) 380px" : "1fr",
+            gap: 3,
+            alignItems: "start",
+          }}
+        >
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <Typeahead
+                label="Customer"
+                data={customers}
+                onSelection={(e) => handleCustomerChange(e?.id ?? null)}
+                defaultValue={customers.find((item) => item.id === job.customerId)}
+                className="full-width-input" // Ensure consistent width
+              />
+              {details.customerId && !isWide && history}
+              <TextField
+                label="Job Name"
+                name="name"
+                value={details.name}
+                onChange={handleChange}
+                variant="outlined"
+                fullWidth
+              />
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="Call Date"
+                  value={details.callDate ? dayjs(details.callDate) : null}
+                  onChange={handleCallDateChange}
+                  slotProps={{ textField: { fullWidth: true } }}
+                  renderInput={(params) => <TextField {...params} />}
+                />
+              </LocalizationProvider>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: theme.spacing(1),
+                }}
+              >
+                <span className="field-group-label">Tasks</span>
+                {details.tasks.map((task, index) => (
+                  <TextField
+                    key={index}
+                    label={`Task ${index + 1}`}
+                    value={task}
+                    onChange={(e) => handleTaskChange(index, e.target.value)}
+                    variant="outlined"
+                    fullWidth
+                    multiline // Enable text wrapping
+                    minRows={1} // Start with a single row, expand as needed
+                    InputProps={{
+                      endAdornment: (
+                        <IconButton
+                          aria-label="delete task"
+                          onClick={() => handleDeleteTask(index)}
+                          edge="end"
+                        >
+                          <Delete />
+                        </IconButton>
+                      ),
+                    }}
+                  />
+                ))}
+                <Button
+                  variant="outlined"
+                  startIcon={<Add />}
+                  onClick={handleAddTask}
+                  sx={{ width: "100%", mt: 1 }}
+                >
+                  Add Task
+                </Button>
+              </div>
+              <TextField
+                label="Notes"
+                name="notes"
+                value={details.notes}
+                onChange={handleChange}
+                variant="outlined"
+                fullWidth
+                multiline
+                rows={4}
+              />
+              <TextField
+                label="Price"
+                name="price"
+                value={details.price}
+                onChange={handleChange}
+                disabled={details.isPaid || details.customerSigned}
+                variant="outlined"
+                fullWidth
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={details.isPaid}
+                    onChange={() => {
+                      setDetails((prevDetails) => ({
+                        ...prevDetails,
+                        isPaid: !details.isPaid,
+                      }));
+                    }}
+                  />
+                }
+                label="Invoice Paid"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    disabled
+                    checked={details.customerSigned}
+                    onChange={() => {
+                      setDetails((prevDetails) => ({
+                        ...prevDetails,
+                        customerSigned: !details.customerSigned,
+                      }));
+                    }}
+                  />
+                }
+                label="Contract Signed"
+              />
+              <TextField
+                label="Duration In Hours"
+                name="durationInHours"
+                value={details.durationInHours}
+                onChange={handleChange}
+                variant="outlined"
+                fullWidth
+              />
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DateTimePicker
+                  label="Job Date and Time"
+                  value={details.jobDate ? dayjs(Date.parse(details.jobDate)) : null}
+                  onChange={(newValue) => {
+                    handleJobDateChange(new Date(newValue?.$d));
+                  }}
+                  slotProps={{ textField: { fullWidth: true } }}
+                />
+              </LocalizationProvider>
+              <FormControl fullWidth>
+                <InputLabel id="status-select-label">Status</InputLabel>
+                <Select
+                  labelId="status-select-label"
+                  id="status-select"
+                  value={details.status}
+                  label="Status"
+                  onChange={handleStatusChange}
+                >
+                  {Object.keys(statusOptions).map((groupId) => (
+                    <MenuItem value={groupId} key={groupId}>
+                      {statusOptions[groupId]}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+          </Box>
+          {details.customerId && isWide && (
+            <Box sx={{ position: "sticky", top: 0 }}>{history}</Box>
           )}
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleViewInvoice}
-          >
-            View Invoice
-          </Button>
-          <Button variant="outlined" onClick={onClose}>
-            Close
-          </Button>
-        </div>
-      </div>
+        </Box>
+      </ModalShell>
       <Dialog
         open={open}
         onClose={handleClose}
@@ -465,7 +452,7 @@ const JobDetail = ({
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </>
   );
 };
 

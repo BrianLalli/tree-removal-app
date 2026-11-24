@@ -21,10 +21,74 @@
   }
   
   .rbc-event {
-    background-color: #3174ad;
+    background-color: #3ab649;
     border-radius: 6px;
-    opacity: 0.8;
-    color: black;
+    color: #ffffff;
+  }
+
+  /* Crisper calendar chrome */
+  .rbc-calendar {
+    font-family: inherit;
+  }
+
+  .rbc-toolbar .rbc-toolbar-label {
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: -0.01em;
+  }
+
+  .rbc-toolbar button {
+    border: 1px solid #e3e8e5;
+    color: #14201a;
+    background: #ffffff;
+    font-weight: 500;
+    padding: 6px 12px;
+  }
+
+  .rbc-toolbar button:hover,
+  .rbc-toolbar button:focus {
+    background: #f1f8f2;
+    border-color: #cfe8d3;
+  }
+
+  .rbc-toolbar button.rbc-active,
+  .rbc-toolbar button:active {
+    background: #3ab649;
+    border-color: #3ab649;
+    color: #ffffff;
+    box-shadow: none;
+  }
+
+  .rbc-toolbar button.rbc-active:hover {
+    background: #2a8f38;
+  }
+
+  .rbc-month-view,
+  .rbc-time-view,
+  .rbc-agenda-view table.rbc-agenda-table {
+    border-color: #e3e8e5;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .rbc-header {
+    padding: 8px 4px;
+    font-weight: 600;
+    color: #5b6b62;
+    border-color: #e3e8e5;
+  }
+
+  .rbc-day-bg + .rbc-day-bg,
+  .rbc-month-row + .rbc-month-row {
+    border-color: #eef1ef;
+  }
+
+  .rbc-off-range-bg {
+    background: #f7f9f8;
+  }
+
+  .rbc-today {
+    background-color: #f1f8f2;
   }
   
   /* Handle event styles dynamically based on status */

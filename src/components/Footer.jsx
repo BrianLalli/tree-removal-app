@@ -10,10 +10,11 @@ const FooterBox = styled(Box)(({ theme }) => ({
   left: 0,
   bottom: 0,
   width: '100%',
-  backgroundColor: theme.palette.primary.main,
-  color: theme.palette.getContrastText(theme.palette.grey[900]),
+  backgroundColor: 'rgba(14, 20, 17, 0.9)',
+  backdropFilter: 'blur(12px)',
+  color: 'rgba(255, 255, 255, 0.7)',
   padding: theme.spacing(1, 0),
-  borderTop: `1px solid ${theme.palette.divider}`,
+  borderTop: '1px solid rgba(255, 255, 255, 0.08)',
   display: 'none', // Initially hide footer
   [theme.breakpoints.down('sm')]: {
     padding: theme.spacing(1, 2), // Increase side padding on smaller screens

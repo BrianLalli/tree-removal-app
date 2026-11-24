@@ -1,6 +1,6 @@
 import { useToPng } from "@hugocxl/react-to-image";
-import { Button, TextField } from "@mui/material";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Alert, Button, Chip, CircularProgress, TextField } from "@mui/material";
+import { useNavigate, useParams } from "react-router-dom";
 import "../Invoice.css";
 import { useEffect, useState } from "react";
 import {
@@ -11,36 +11,31 @@ import {
 import { useAppContext } from "../context/appContext";
 
 const Invoice = () => {
+  const { invoiceId } = useParams();
   const [customer, setCustomer] = useState(null);
   const [job, setJob] = useState(null);
+  const [loadError, setLoadError] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [status, setStatus] = useState(null); // { severity, message }
+  const [copied, setCopied] = useState(false);
   const { user } = useAppContext();
   const navigate = useNavigate();
   const [invoiceDate, setInvoiceDate] = useState(
     new Date().toISOString().slice(0, 10)
   );
-  const customDateInputStyle = {
-    fontSize: "1rem", // Adjust font size to match the form
-    padding: "10px", // Add some padding for better spacing
-    maxWidth: "200px", // Set a max width to keep it from getting too large
-    margin: "10px 0", // Add some margin for spacing
-    borderColor: "lightgray", // Border color to match other inputs
-    borderRadius: "4px", // Slightly rounded borders for a modern look
-  };
 
   useEffect(() => {
     const fetchData = async () => {
-      let data = await getJobAndCustomerById(
-        window.location.href.split("/")[
-          window.location.href.split("/").length - 1
-        ]
-      );
-      if (data.customer && data.job) {
+      const data = await getJobAndCustomerById(invoiceId);
+      if (data?.customer && data?.job) {
         setCustomer(data.customer);
         setJob(data.job);
+      } else {
+        setLoadError(true);
       }
     };
     fetchData();
-  }, []);
+  }, [invoiceId]);
 
   const [_, convert, ref] = useToPng({
     quality: 0.8,
@@ -56,94 +51,162 @@ const Invoice = () => {
     },
   });
 
-  if (!customer || !job) return <div>Loading...</div>;
+  if (loadError)
+    return (
+      <div className="invoice-page">
+        <div className="invoice-state">
+          This invoice could not be found. Please check the link and try again.
+        </div>
+      </div>
+    );
+
+  if (!customer || !job)
+    return (
+      <div className="invoice-page">
+        <div className="invoice-state">
+          <CircularProgress size={28} />
+        </div>
+      </div>
+    );
+
+  const customerName = (job.signedCustomerName || "").trim();
+  const repName = (job.companyRepName || "").trim();
+
+  const togglePaid = async () => {
+    await setJobPaidStatus({ id: job.id, isPaid: !job.isPaid });
+    setJob((prev) => ({ ...prev, isPaid: !prev.isPaid }));
+  };
+
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (e) {
+      console.error("Failed to copy link", e);
+    }
+  };
+
+  // Customers (not logged in) sign their name and submit, which locks the invoice.
+  // The company rep (logged in) can pre-sign before sending the link; that does not
+  // lock the invoice unless the customer's signature is also filled in.
+  const handleSubmit = async () => {
+    setSubmitting(true);
+    setStatus(null);
+    try {
+      const saved = await updateCustomerSigned(
+        user
+          ? {
+              id: job.id,
+              signedCustomerName: customerName || null,
+              companyRepName: repName || null,
+              lock: !!customerName,
+            }
+          : {
+              id: job.id,
+              signedCustomerName: customerName,
+              lock: true,
+            }
+      );
+      setJob((prev) => ({ ...prev, ...saved }));
+      setStatus({
+        severity: "success",
+        message: saved.customerSigned
+          ? "Thank you! Your signed invoice has been sent to Two Guys Tree Service."
+          : "Rep signature saved. Send the link to the customer to sign.",
+      });
+    } catch (e) {
+      setStatus({
+        severity: "error",
+        message:
+          "Something went wrong saving the signature. Please try again, or contact us at twoguystreeservice@outlook.com.",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const canSubmit = user ? !!(customerName || repName) : !!customerName;
 
   return (
-    <div>
-      <Button onClick={convert} className="downloadButton">
-        Download Invoice
-      </Button>
-      {user && (
-        <>
-          {job.isPaid ? (
-            <Button
-              onClick={() => {
-                setJobPaidStatus({ id: job.id, isPaid: false });
-                window.location.href = window.location.href;
-              }}
-              className="paidButton"
-            >
-              Mark as Not Paid
+    <div className="invoice-page">
+      <div className="invoice-toolbar">
+        <Button variant="outlined" onClick={convert}>
+          Download Invoice
+        </Button>
+        {user && (
+          <>
+            <Button variant="outlined" onClick={togglePaid}>
+              {job.isPaid ? "Mark as Not Paid" : "Mark as Paid"}
             </Button>
-          ) : (
-            <Button
-              onClick={() => {
-                setJobPaidStatus({ id: job.id, isPaid: true });
-                window.location.href = window.location.href;
-              }}
-              className="paidButton"
-            >
-              Mark as Paid
+            <Button variant="outlined" onClick={copyLink}>
+              {copied ? "Link Copied!" : "Copy Link"}
             </Button>
-          )}
-          <Button
-            onClick={() => navigator.clipboard.writeText(window.location.href)}
-            className="dashboardButton"
-          >
-            Copy to Clipboard
-          </Button>
-          <Button
-            onClick={() => navigate("/working-board")}
-            className="dashboardButton"
-          >
-            Back to Dashboard
-          </Button>
-        </>
-      )}
+            <Button variant="text" onClick={() => navigate("/working-board")}>
+              Back to Dashboard
+            </Button>
+          </>
+        )}
+      </div>
+
       <div ref={ref} className="invoice">
-        <img src="/TGTR.png" alt="Image" className="image" />
-        <div className="formContainer">
-          <div className="formElementParent">
-            {/* Tasks to be performed section */}
-            <div className="tasksList">
-              <h3>Tasks to be performed:</h3>
-              <ul>
-                {job.tasks.map((task, index) => (
-                  <li key={index}>{task}</li> // Assuming `task` is a string
-                ))}
-              </ul>
-            </div>
-            <h3>Customer Details:</h3>
-            <div>
-              Name: <span>{customer.name}</span>
-            </div>
-            <div>
-              Address: <span>{customer.address}</span>
-            </div>
+        <div className="invoice-header">
+          <img src="/TGTR.png" alt="Two Guys Tree Service" className="image" />
+          <div className="invoice-badges">
+            {job.customerSigned && (
+              <Chip label="Signed" color="primary" size="small" />
+            )}
+            {job.isPaid && <Chip label="Paid" color="success" size="small" variant="outlined" />}
           </div>
-          <div className="formElementParent"></div>
         </div>
-        <div className="invoiceAmount">Total Price: ${job.price}</div>
-        <div style={{ marginTop: '1rem', marginBottom: '0' }}>Invoice Date:</div>
-        <div>
+
+        <div className="invoice-section">
+          <h3>Customer Details</h3>
+          <div className="invoice-row">
+            <span className="invoice-label">Name</span>
+            <span>{customer.name}</span>
+          </div>
+          <div className="invoice-row">
+            <span className="invoice-label">Address</span>
+            <span>{customer.address}</span>
+          </div>
+        </div>
+
+        <div className="invoice-section">
+          <h3>Tasks to be performed</h3>
+          <ul className="tasksList">
+            {(job.tasks || [])
+              .filter((task) => task && task.trim())
+              .map((task, index) => (
+                <li key={index}>{task}</li>
+              ))}
+          </ul>
+        </div>
+
+        <div className="invoice-total">
+          <span>Total Price</span>
+          <span className="invoiceAmount">${job.price}</span>
+        </div>
+
+        <div className="invoice-date">
           <TextField
             type="date"
+            label="Invoice Date"
+            size="small"
             value={invoiceDate}
             onChange={(e) => setInvoiceDate(e.target.value)}
-            InputLabelProps={{
-              shrink: true,
-            }}
-            style={customDateInputStyle}
+            InputLabelProps={{ shrink: true }}
           />
         </div>
+
         <div className="invoice-footer">
           <div className="signatures-container">
             <TextField
-              label="Customer Signature"
+              label="Customer Signature (type your full name)"
               name="customerSignatureName"
               variant="standard"
               disabled={job.customerSigned}
-              value={job.signedCustomerName}
+              value={job.signedCustomerName || ""}
               onChange={(e) => {
                 setJob((prev) => ({
                   ...prev,
@@ -162,41 +225,40 @@ const Invoice = () => {
                 }));
               }}
               variant="standard"
-              disabled={job.customerSigned}
-              value={job.companyRepName}
+              disabled={job.customerSigned || !user}
+              value={job.companyRepName || ""}
               fullWidth
             />
           </div>
-          <div>
-            <span className="signature-disclaimer">
-              By completing the typed signature input, I agree that my
-              electronic signature is the legal equivalent of my
-              manual/handwritten signature on this document. I consent to the
-              legally binding terms and conditions of this document.
-            </span>
-          </div>
+          <p className="signature-disclaimer">
+            By completing the typed signature input, I agree that my electronic
+            signature is the legal equivalent of my manual/handwritten signature
+            on this document. I consent to the legally binding terms and
+            conditions of this document.
+          </p>
 
           <div className="email-insurance">
-            <div>Email: twoguystreeservice@outlook.com</div>
-            <div>Fully Insured</div>
+            <span>Email: twoguystreeservice@outlook.com</span>
+            <span>Fully Insured</span>
           </div>
         </div>
       </div>
 
-      {!job.customerSigned && user && (
+      {status && (
+        <Alert severity={status.severity} className="invoice-alert">
+          {status.message}
+        </Alert>
+      )}
+
+      {!job.customerSigned && (
         <Button
-          onClick={async () => {
-            await updateCustomerSigned({
-              id: job.id,
-              signedCustomerName: job.signedCustomerName,
-              companyRepName: job.companyRepName,
-            });
-            window.location.href = window.location.href;
-          }}
-          disabled={!job.signedCustomerName && !job.companyRepName}
+          variant="contained"
+          size="large"
+          onClick={handleSubmit}
+          disabled={!canSubmit || submitting}
           className="submitButton"
         >
-          Sign and Submit
+          {submitting ? "Submitting…" : "Sign and Submit"}
         </Button>
       )}
     </div>

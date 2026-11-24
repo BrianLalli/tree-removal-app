@@ -1,45 +1,40 @@
 import React from "react";
-import { Container, Typography, Box, Button } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import SearchBar from "../components/SearchBar";
+import { Container, Typography, Button, Box } from "@mui/material";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { Link } from "react-router-dom";
-
-const StyledButton = styled(Button)(({ theme }) => ({
-  border: `2px solid ${theme.palette.primary.main}`,
-  borderRadius: 12,
-  margin: theme.spacing(3), // Slightly increased margin for better spacing around a larger button
-  color: theme.palette.common.white,
-  backgroundColor: theme.palette.primary.main, // Ensure the button has a background color by default
-  transition: "all 0.3s ease",
-  "&:hover": {
-    transform: "scale(1.05)",
-    backgroundColor: theme.palette.primary.dark, // Slightly darker on hover for better contrast
-    color: theme.palette.common.white,
-  },
-  // Increase font size and padding for a bigger button on all screen sizes
-  fontSize: "1.25rem", // Larger font size for better visibility
-  padding: theme.spacing(1, 3), // Increased padding for a larger overall button size
-  [theme.breakpoints.down("sm")]: {
-    // Adjustments for small screens can remain or be further customized
-    fontSize: "1rem", // You might keep this smaller on very small screens
-    padding: theme.spacing(1.5, 3), // Slightly less padding on small screens
-  },
-}));
 
 const HomePage = () => {
   return (
     <Container
       maxWidth="md"
-      sx={{ padding: 0, textAlign: "center", py: { xs: 4, sm: 8 } }}
+      sx={{ padding: 0, textAlign: "center", py: { xs: 6, sm: 10 } }}
     >
+      <Box
+        sx={{
+          display: "inline-block",
+          px: 1.5,
+          py: 0.5,
+          mb: 3,
+          mt: { xs: 6, sm: 8 },
+          borderRadius: 999,
+          border: "1px solid rgba(58,182,73,0.35)",
+          bgcolor: "rgba(58,182,73,0.1)",
+          color: "#7fdc8a",
+          fontSize: "0.8125rem",
+          fontWeight: 600,
+        }}
+      >
+        Two Guys Tree Service
+      </Box>
       <Typography
         component="h1"
         gutterBottom
         sx={{
-          fontWeight: 700,
-          fontSize: { xs: "2.5rem", sm: "2.5rem", md: "4rem" },
-          lineHeight: 1.0,
-          mt: 10,
+          fontWeight: 800,
+          fontSize: { xs: "2.5rem", sm: "3rem", md: "4.25rem" },
+          lineHeight: 1.05,
+          letterSpacing: "-0.035em",
+          color: "#ffffff",
         }}
       >
         Tree removal made easy
@@ -47,20 +42,36 @@ const HomePage = () => {
 
       <Typography
         variant="h5"
-        color="textSecondary"
         paragraph
         sx={{
-          fontWeight: 500,
-          fontSize: { xs: "1rem", sm: "1.25rem", md: "1.5rem" },
-          mb: 4,
+          fontWeight: 400,
+          fontSize: { xs: "1.05rem", sm: "1.25rem", md: "1.375rem" },
+          color: "rgba(255,255,255,0.65)",
+          maxWidth: 560,
+          mx: "auto",
+          mb: 5,
         }}
       >
         Manage simple to complex jobs and everything in between
       </Typography>
 
-      <Link to="/working-board" style={{ textDecoration: "none" }}>
-        <StyledButton variant="contained">Get Started</StyledButton>
-      </Link>
+      <Button
+        component={Link}
+        to="/working-board"
+        variant="contained"
+        size="large"
+        endIcon={<ArrowForwardIcon />}
+        sx={{
+          px: 4,
+          py: 1.5,
+          fontSize: "1.0625rem",
+          borderRadius: 999,
+          boxShadow: "0 8px 24px rgba(58,182,73,0.35)",
+          "&:hover": { bgcolor: "primary.dark", color: "#fff" },
+        }}
+      >
+        Get Started
+      </Button>
     </Container>
   );
 };

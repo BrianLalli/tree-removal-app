@@ -6,12 +6,7 @@ const Typeahead = ({ label, data, onSelection, defaultValue }) => {
     <Autocomplete
       freeSolo
       id="customer-search"
-      style={{
-        width: "100%",
-        backgroundColor: "#eee",
-        color: "white",
-        borderRadius: "16px",
-      }}
+      style={{ width: "100%" }}
       options={data}
       getOptionLabel={(option) => option.name}
       defaultValue={defaultValue}

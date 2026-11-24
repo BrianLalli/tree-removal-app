@@ -9,11 +9,13 @@ import {
   Slide,
   useScrollTrigger,
   Drawer,
+  Divider,
+  IconButton,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import supabase from "../utils/supabaseClient";
 import logo from "../assets/images/logo-with-letters-2.png";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 function HideOnScroll(props) {
   const { children } = props;
@@ -31,6 +33,7 @@ const HIGHLIGHTS_URL =
 
 const Header = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { pathname } = useLocation();
 
   const toggleDrawer = (open) => (event) => {
     if (
@@ -48,21 +51,37 @@ const Header = () => {
     setDrawerOpen(false); // Close the drawer on logout
   };
 
+  const navItems = [
+    { label: "Dashboard", to: "/working-board" },
+    { label: "Calendar", to: "/calendar" },
+  ];
+
+  const navButtonSx = (active) => ({
+    color: active ? "#ffffff" : "rgba(255,255,255,0.72)",
+    bgcolor: active ? "rgba(58,182,73,0.22)" : "transparent",
+    px: 1.75,
+    "&:hover": {
+      bgcolor: active ? "rgba(58,182,73,0.3)" : "rgba(255,255,255,0.08)",
+      color: "#ffffff",
+    },
+  });
+
   return (
     <HideOnScroll>
       <AppBar
         position="fixed"
+        elevation={0}
         sx={{
-          boxShadow: 0,
-          bgcolor: "transparent",
+          bgcolor: "rgba(14, 20, 17, 0.78)",
+          backdropFilter: "saturate(160%) blur(12px)",
           backgroundImage: "none",
-          mt: 2,
+          borderBottom: "1px solid rgba(255,255,255,0.08)",
         }}
       >
         <Container maxWidth="lg">
           <Toolbar
             disableGutters
-            sx={{ display: "flex", justifyContent: "space-between" }}
+            sx={{ display: "flex", justifyContent: "space-between", minHeight: { xs: 60, sm: 68 } }}
           >
             {/* Logo aligned to the left */}
             <Box
@@ -73,12 +92,12 @@ const Header = () => {
                 flexGrow: 1,
               }}
             >
-              <Link to="/" style={{ textDecoration: "none" }}>
+              <Link to="/" style={{ textDecoration: "none", display: "flex" }}>
                 <img
                   src={logo}
                   alt="Company Logo"
                   style={{
-                    height: "50px",
+                    height: "44px",
                     width: "auto",
                   }}
                 />
@@ -90,39 +109,43 @@ const Header = () => {
               sx={{
                 display: { xs: "none", md: "flex" },
                 alignItems: "center",
-                justifyContent: "space-around",
-                padding: "0 10px",
-                gap: "10px",
+                gap: 0.5,
               }}
             >
+              {navItems.map((item) => (
+                <Button
+                  key={item.to}
+                  component={Link}
+                  to={item.to}
+                  sx={navButtonSx(pathname === item.to)}
+                >
+                  {item.label}
+                </Button>
+              ))}
+
               {/* Highlights – external link */}
-              <a
+              <Button
+                component="a"
                 href={HIGHLIGHTS_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ textDecoration: "none" }}
+                sx={navButtonSx(false)}
               >
-                <Button color="primary" variant="contained">
-                  Highlights
-                </Button>
-              </a>
-
-              <Link to="/calendar" style={{ textDecoration: "none" }}>
-                <Button color="primary" variant="contained">
-                  Calendar
-                </Button>
-              </Link>
-
-              <Link to="/working-board" style={{ textDecoration: "none" }}>
-                <Button color="primary" variant="contained">
-                  Dashboard
-                </Button>
-              </Link>
+                Highlights
+              </Button>
 
               <Button
-                color="primary"
-                variant="contained"
+                variant="outlined"
                 onClick={handleLogout}
+                sx={{
+                  ml: 1.5,
+                  color: "rgba(255,255,255,0.85)",
+                  borderColor: "rgba(255,255,255,0.2)",
+                  "&:hover": {
+                    borderColor: "rgba(255,255,255,0.45)",
+                    bgcolor: "rgba(255,255,255,0.06)",
+                  },
+                }}
               >
                 Logout
               </Button>
@@ -130,9 +153,13 @@ const Header = () => {
 
             {/* Mobile Menu Icon */}
             <Box sx={{ display: { xs: "block", md: "none" } }}>
-              <Button onClick={toggleDrawer(true)} color="primary">
+              <IconButton
+                onClick={toggleDrawer(true)}
+                aria-label="Open menu"
+                sx={{ color: "#ffffff" }}
+              >
                 <MenuIcon />
-              </Button>
+              </IconButton>
             </Box>
 
             {/* Mobile Drawer */}
@@ -140,32 +167,44 @@ const Header = () => {
               anchor="right"
               open={drawerOpen}
               onClose={toggleDrawer(false)}
+              PaperProps={{ sx: { borderRadius: "16px 0 0 16px" } }}
             >
               <Box
-                sx={{ width: 250 }}
+                sx={{ width: 260, py: 2 }}
                 role="presentation"
                 onClick={toggleDrawer(false)}
                 onKeyDown={toggleDrawer(false)}
               >
+                {navItems.map((item) => (
+                  <MenuItem
+                    key={item.to}
+                    component={Link}
+                    to={item.to}
+                    selected={pathname === item.to}
+                    sx={{ py: 1.5, px: 3, fontWeight: 500, color: "text.primary" }}
+                  >
+                    {item.label}
+                  </MenuItem>
+                ))}
+
                 {/* Highlights – external link */}
-                <a
+                <MenuItem
+                  component="a"
                   href={HIGHLIGHTS_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ color: "black", textDecoration: "none" }}
+                  sx={{ py: 1.5, px: 3, fontWeight: 500, color: "text.primary" }}
                 >
-                  <MenuItem>Highlights</MenuItem>
-                </a>
+                  Highlights
+                </MenuItem>
 
-                <Link to="/calendar" style={{ color: "black" }}>
-                  <MenuItem>Calendar</MenuItem>
-                </Link>
-
-                <Link to="/working-board" style={{ color: "black" }}>
-                  <MenuItem>Dashboard</MenuItem>
-                </Link>
-
-                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                <Divider sx={{ my: 1 }} />
+                <MenuItem
+                  onClick={handleLogout}
+                  sx={{ py: 1.5, px: 3, fontWeight: 500, color: "text.secondary" }}
+                >
+                  Logout
+                </MenuItem>
               </Box>
             </Drawer>
           </Toolbar>
