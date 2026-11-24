@@ -14,13 +14,9 @@ import {
   restoreCustomer,
   saveCustomer,
 } from "../api/customers";
+import ModalShell from "./ModalShell";
+import CustomerJobHistory from "./CustomerJobHistory";
 
-const statusOptions = {
-  "group-1": "Opportunities",
-  "group-2": "Pending",
-  "group-3": "Upcoming Jobs",
-  "group-4": "Completed Jobs",
-};
 
 const initialCustomerState = {
   id: null,
@@ -52,7 +48,7 @@ const CustomerDetail = ({ customer, onClose, refetch, setEditingJob }) => {
 
   const handleSave = async () => {
     await saveCustomer(details);
-    refetch();
+    refetch?.();
     onClose();
   };
 
@@ -61,52 +57,45 @@ const CustomerDetail = ({ customer, onClose, refetch, setEditingJob }) => {
 
   const handleDelete = async () => {
     await archiveCustomer({ id: customer.id });
-    refetch();
+    refetch?.();
     handleClose();
   };
 
   const handleRestore = async () => {
     await restoreCustomer({ id: customer.id });
-    refetch();
+    refetch?.();
     handleClose();
   };
 
+  const footer = (
+    <>
+      {customer.id &&
+        (details.archived ? (
+          <Button color="warning" onClick={handleRestore} sx={{ mr: "auto" }}>
+            Restore
+          </Button>
+        ) : (
+          <Button color="error" onClick={handleOpen} sx={{ mr: "auto" }}>
+            Archive
+          </Button>
+        ))}
+      <Button variant="text" onClick={onClose}>
+        Close
+      </Button>
+      <Button variant="contained" color="primary" onClick={handleSave}>
+        Save
+      </Button>
+    </>
+  );
+
   return (
-    <div
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        alignItems: "flex-start", // Aligns the form to the top, especially important on small screens
-        justifyContent: "center",
-        backgroundColor: "rgba(0, 0, 0, 0.9)",
-        paddingTop: "10vh", // Adds some space at the top
-        zIndex: theme.zIndex.modal,
-        overflowY: "auto", // Allows scrolling on small screens
-      }}
-    >
-      <div
-        style={{
-          marginTop: "20px", // Additional top margin if needed
-          padding: theme.spacing(2),
-          backgroundColor: theme.palette.background.default,
-          boxShadow: theme.shadows[5],
-          display: "flex",
-          flexDirection: "column",
-          width: "90%", // Set width to 90% of the viewport
-          maxWidth: "500px", // Maximum width for larger screens
-          maxHeight: "80vh", // Max height to ensure it fits in the viewport
-          overflowY: "auto", // Scroll inside the form if content is too tall
-          color: theme.palette.text.primary,
-          border: `4px solid ${theme.palette.primary.main}`,
-          borderRadius: theme.shape.borderRadius,
-          textAlign: "center",
-          gap: theme.spacing(1), // Reduced gap to save space
-          zIndex: theme.zIndex.modal + 1,
-        }}
+    <>
+      <ModalShell
+        title={customer.id ? details.name || "Customer" : "New Customer"}
+        subtitle={customer.id ? details.address : null}
+        onClose={onClose}
+        footer={footer}
+        maxWidth={560}
       >
         <TextField
           label="Name"
@@ -119,7 +108,7 @@ const CustomerDetail = ({ customer, onClose, refetch, setEditingJob }) => {
         <TextField
           label="Phone Number"
           name="phoneNumber"
-          value={details.phoneNumber}
+          value={details.phoneNumber || ""}
           onChange={handleChange}
           variant="outlined"
           fullWidth
@@ -127,7 +116,7 @@ const CustomerDetail = ({ customer, onClose, refetch, setEditingJob }) => {
         <TextField
           label="Address"
           name="address"
-          value={details.address}
+          value={details.address || ""}
           onChange={handleChange}
           variant="outlined"
           fullWidth
@@ -135,67 +124,18 @@ const CustomerDetail = ({ customer, onClose, refetch, setEditingJob }) => {
         <TextField
           label="Email Address"
           name="email"
-          value={details.email}
+          value={details.email || ""}
           onChange={handleChange}
           variant="outlined"
           fullWidth
         />
-        <span>Jobs</span>
-        {details?.jobs &&
-          details?.jobs.map((job, index) => {
-            // Check if jobDate is a string before splitting
-            const jobDate = job.jobDate ? job.jobDate.split("T")[0] : "No Date";
-            return (
-              <Button
-                key={job + index}
-                variant="contained"
-                color="primary"
-                onClick={() => setEditingJob(job)}
-              >
-                {`${job.name}: ${jobDate} (${statusOptions[job.status]})`}
-              </Button>
-            );
-          })}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            marginTop: theme.spacing(3),
-          }}
-        >
-          <Button variant="contained" color="primary" onClick={handleSave}>
-            Save
-          </Button>
-
-          {details.archived ? (
-            <Button
-              variant="contained"
-              sx={{
-                bgcolor: theme.palette.warning.main,
-                "&:hover": { bgcolor: theme.palette.warning.dark },
-              }}
-              onClick={handleRestore}
-            >
-              Restore
-            </Button>
-          ) : (
-            <Button
-              variant="contained"
-              sx={{
-                bgcolor: theme.palette.error.main,
-                "&:hover": { bgcolor: theme.palette.error.dark },
-              }}
-              onClick={handleOpen}
-            >
-              Archive
-            </Button>
-          )}
-
-          <Button variant="outlined" onClick={onClose}>
-            Close
-          </Button>
-        </div>
-      </div>
+        {customer.id && (
+          <CustomerJobHistory
+            customerId={customer.id}
+            onSelectJob={setEditingJob}
+          />
+        )}
+      </ModalShell>
       <Dialog
         open={open}
         onClose={handleClose}
@@ -222,7 +162,7 @@ const CustomerDetail = ({ customer, onClose, refetch, setEditingJob }) => {
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </>
   );
 };
 

@@ -1,126 +1,186 @@
-/* Invoice general styles for a clean look */
-.invoice {
-  max-width: 700px;
-  margin: auto;
-  padding: 20px;
-  border: 4px solid white;
-  background-color: white;
-  color: black;
-  margin: 10px;
-  margin-bottom: 20px;
-  border: none;
-  border-radius: 4px; /* Rounded corners for buttons */
-  box-shadow: 0px 2px 4px rgba(0,0,0,0.2); /* Button shadow for depth */
+.invoice-page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+  box-sizing: border-box;
 }
 
-/* Image and header styles */
+.invoice-state {
+  display: flex;
+  justify-content: center;
+  padding: 80px 16px;
+  color: var(--tg-text-muted);
+}
+
+.invoice-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.invoice {
+  background: #ffffff;
+  color: #14201a;
+  border-radius: 16px;
+  padding: 32px;
+  text-align: left;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12), 0 12px 32px rgba(0, 0, 0, 0.25);
+}
+
+.invoice-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e6ebe7;
+}
+
+.invoice-badges {
+  display: flex;
+  gap: 8px;
+}
+
 .image {
   width: 50%;
+  max-width: 300px;
   height: auto;
-  margin: 0 auto; /* Center image */
 }
 
-/* Style adjustments for buttons */
-.downloadButton,
-.paidButton,
-.dashboardButton,
-.submitButton {
-  position: relative;
-  display: block;
-  margin-top: 10px;
-  background-color: #4CAF50 !important;
-  color: black !important;
-  margin: 10px !important;
-  margin-bottom: 20px !important;
+.invoice-section {
+  padding: 20px 0;
+  border-bottom: 1px solid #e6ebe7;
 }
 
-/* Task list styling for clear, bulleted tasks */
+.invoice-section h3 {
+  margin: 0 0 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #5b6b62;
+}
+
+.invoice-row {
+  display: flex;
+  gap: 16px;
+  padding: 4px 0;
+}
+
+.invoice-label {
+  min-width: 80px;
+  color: #5b6b62;
+}
+
 .tasksList {
-  text-align: center; /* Align tasks text to the left */
-  margin: 0 auto; /* Center the container */
-  max-width: 640px; /* Set a max-width or width that fits your design */
-  margin-bottom: 40px;
-}
-
-.tasksList h3 {
-  text-align: center; /* Align the title "Tasks to be performed" to the center */
-}
-
-.tasksList ul {
   list-style: none;
-  padding-left: 0;
-  text-align: center; /* Center the bulleted list */
-  display: inline-block; /* Allows the bulleted list to respect text-align center */
+  padding: 0;
+  margin: 0;
 }
 
-.tasksList ul li {
-  text-align: left; /* Align the text of list items to the left */
+.tasksList li {
   position: relative;
-  padding-left: 20px; /* Add padding to the left of list items for custom bullets */
+  padding: 6px 0 6px 22px;
+  line-height: 1.45;
+  white-space: pre-wrap;
 }
 
-.tasksList ul li::before {
-  content: '•'; /* Custom bullet point */
-  color: #4CAF50; /* Green color for bullet */
-  font-size: 20px; /* Larger bullet point */
+.tasksList li::before {
+  content: "";
   position: absolute;
-  left: 0; /* Align bullets to the left edge */
-  top: 0;
+  left: 4px;
+  top: 14px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #3ab649;
 }
 
-/* Signature line styles */
-
-.customer-name-line, .customer-signature-line,
-.company-name-line, .company-signature-line {
-  margin-bottom: 50px;
+.invoice-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 20px 0 8px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  background: #f1f8f2;
+  font-weight: 500;
 }
 
 .invoiceAmount {
-  font-size: 20px;
-  font-weight: bold;
-  margin-top: 20px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f7a2c;
 }
 
-/* Base styles for signature and name lines */
-.line {
-  border-bottom: 1px solid #000;
-  width: 70%;
-  margin: 0 auto;
-  display: block;
+.invoice-date {
+  margin: 20px 0 8px;
 }
 
-/* Flex container for both Customer and Company sections */
 .signatures-container {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-top: 20px;
-  width: 100%;
   flex-direction: column;
-  div {
-    margin: 10px auto;
-  }
+  gap: 20px;
+  margin-top: 16px;
 }
 
 .signature-disclaimer {
   font-size: 12px;
-  margin-top: 10px;
+  line-height: 1.5;
+  color: #5b6b62;
+  margin: 20px 0 0;
 }
 
-.signature-section {
-  width: 100%;
-}
-
-/* Classes for Customer and Company sections */
-.customer-section, .company-section {
-  width: 50%;
-  text-align: center;
-}
-
-/* Email and insurance should be centered and on the next line if there isn't enough space */
 .email-insurance {
-  width: 100%; /* Take the full width */
-  justify-content: center; /* Center the content */
-  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #e6ebe7;
+  font-size: 0.875rem;
+  color: #5b6b62;
 }
 
+.invoice-alert {
+  margin-top: 20px;
+  text-align: left;
+}
+
+.submitButton {
+  display: block !important;
+  margin: 20px auto 0 !important;
+  min-width: 220px;
+}
+
+.submitButton.Mui-disabled {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  color: rgba(255, 255, 255, 0.45) !important;
+}
+
+.invoice-toolbar .MuiButton-outlined {
+  color: rgba(255, 255, 255, 0.9);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.invoice-toolbar .MuiButton-outlined:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+.invoice-toolbar .MuiButton-text {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+@media (max-width: 600px) {
+  .invoice {
+    padding: 20px;
+    border-radius: 12px;
+  }
+  .image {
+    width: 70%;
+  }
+}

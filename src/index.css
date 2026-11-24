@@ -1,11 +1,18 @@
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  /* Set the base theme to dark explicitly */
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* App shell is dark; cards and dialogs are light */
+  --tg-bg: #0e1411;
+  --tg-surface: rgba(255, 255, 255, 0.04);
+  --tg-border: rgba(255, 255, 255, 0.08);
+  --tg-text: rgba(255, 255, 255, 0.92);
+  --tg-text-muted: rgba(255, 255, 255, 0.6);
+  --tg-green: #3ab649;
+
+  color: var(--tg-text);
+  background-color: var(--tg-bg);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -13,16 +20,15 @@
   -moz-osx-font-smoothing: grayscale;
   --header-height: 66px;
   --footer-height: 50px;
-  width: 100vw;
 }
 
 a {
   font-weight: 500;
-  color: #3ab649;
+  color: var(--tg-green);
   text-decoration: inherit;
 }
 a:hover {
-  color: #3FA646;
+  color: #5fcf6c;
 }
 
 body {
@@ -31,6 +37,10 @@ body {
   min-height: 100vh;
   width: 100%;
   overflow-x: hidden;
+  background:
+    radial-gradient(1200px 600px at 50% -200px, rgba(58, 182, 73, 0.12), transparent 70%),
+    var(--tg-bg);
+  background-attachment: fixed;
 }
 
 h1 {
@@ -39,33 +49,18 @@ h1 {
 }
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #3ab649;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
 }
 
-/* Removed prefers-color-scheme media query to enforce dark theme only */
+::selection {
+  background: rgba(58, 182, 73, 0.35);
+}
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
   h1 {
     font-size: 2.5em;
-  }
-  button {
-    padding: 0.8em 1.4em;
   }
 }
 
@@ -73,10 +68,14 @@ button:focus-visible {
   h1 {
     font-size: 2em;
   }
-  button {
-    padding: 0.9em 1.6em;
-  }
   a {
     font-size: 0.9em;
   }
+}
+
+.loading-component {
+  display: flex;
+  justify-content: center;
+  padding: 80px 16px;
+  color: var(--tg-text-muted);
 }

@@ -121,18 +121,46 @@ export const setJobPaidStatus = async ({ id, isPaid }) => {
   }
 };
 
+export const getJobsByCustomerId = async (customerId) => {
+  if (!customerId) return [];
+  const { data, error } = await supabase
+    .from("jobs")
+    .select("*")
+    .eq("customerId", customerId)
+    .order("created_at", { ascending: false });
+  if (error) {
+    console.error("Failed to fetch customer jobs", error);
+    throw error;
+  }
+  return data || [];
+};
+
+// Saves invoice signatures. `lock` marks the contract as signed (customerSigned),
+// which freezes the signature fields and price. Throws if nothing was saved so the
+// invoice page can tell the signer instead of silently failing.
 export const updateCustomerSigned = async ({
   id,
   signedCustomerName,
   companyRepName,
+  lock = true,
 }) => {
-  try {
-    const { data } = await supabase
-      .from("jobs")
-      .update({ customerSigned: true, signedCustomerName, companyRepName })
-      .eq("id", id);
-    console.log("Successfully updated customer signed status!", data);
-  } catch (e) {
-    console.error("Failed to update customer signed status", e);
+  const updates = {};
+  if (signedCustomerName !== undefined) updates.signedCustomerName = signedCustomerName;
+  if (companyRepName !== undefined) updates.companyRepName = companyRepName;
+  if (lock) updates.customerSigned = true;
+
+  const { data, error } = await supabase
+    .from("jobs")
+    .update(updates)
+    .eq("id", id)
+    .select();
+
+  if (error) {
+    console.error("Failed to update customer signed status", error);
+    throw error;
   }
+  if (!data || data.length === 0) {
+    throw new Error("Signature could not be saved.");
+  }
+  return data[0];
 };

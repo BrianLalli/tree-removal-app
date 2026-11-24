@@ -1,22 +1,49 @@
 /* Login.css */
+.auth-page {
+  min-height: calc(100vh - 4rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  box-sizing: border-box;
+}
+
+.auth-logo {
+  height: 56px;
+  width: auto;
+  margin-bottom: 24px;
+}
+
 .auth-container {
-    padding: 20px;  /* Provides padding inside the container */
-    max-width: 360px;  /* Sets a maximum width for the component on larger screens */
-    margin: 0 auto;  /* Centers the component horizontally */
-    width: 100%;  /* Ensures it takes the full width on smaller devices */
+  width: 100%;
+  max-width: 380px;
+  margin: 0 auto;
+  padding: 32px;
+  box-sizing: border-box;
+  text-align: left;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+}
+
+.auth-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.auth-subtitle {
+  margin: 4px 0 16px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9375rem;
+}
+
+@media (max-width: 600px) {
+  .auth-container {
+    padding: 24px 20px;
+    font-size: 14px;
   }
-  
-  @media (max-width: 600px) {
-    .auth-container {
-      padding: 10px;  /* Smaller padding for smaller screens */
-      font-size: 14px;  /* Adjust font size for smaller screens */
-    }
-  }
-  
-  @media (min-width: 601px) {
-    .auth-container {
-      padding: 30px;  /* Larger padding for larger screens */
-      font-size: 16px;  /* Larger font size for readability on larger screens */
-    }
-  }
-  
+}
